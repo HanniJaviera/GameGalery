@@ -16,26 +16,25 @@ export default function HomeCarousel() {
             Descubre los juegos más populares y mejor calificados por nuestra
             comunidad. No te pierdas las últimas novedades en la galería.
           </p>
-          {/* Tu botón "btn-1" convertido a componente Button/Link */}
-          <Button as={Link} href="/juegos" className="btn-1">
-            {" "}
-            Ver Productos
-          </Button>
+
+          {/* Botón/Link corregido */}
+          <Link href="/juegos" legacyBehavior passHref>
+            <Button className="btn-1">Ver Productos</Button>
+          </Link>
         </div>
 
-        {/* Tu carrusel, traducido a react-bootstrap */}
+        {/* Tu carrusel */}
         <div className="carousel-wrapper">
           <Carousel id="customCarousel" interval={5000}>
             <Carousel.Item>
               <Link href="/infohollowknight">
-                {/* Ruta corregida a / (public) */}
                 <Image
                   src="/hollowknight.jpg"
                   width={900}
-                  height={500} // Asigna un tamaño (puedes ajustarlo)
-                  alt="Juego 1"
+                  height={500}
+                  alt="Hollow Knight - Destacado" // Alt descriptivo
                   className="d-block w-100"
-                  priority // Carga esta imagen primero
+                  priority
                 />
               </Link>
             </Carousel.Item>
@@ -46,7 +45,7 @@ export default function HomeCarousel() {
                   src="/hellisus.jpg"
                   width={900}
                   height={500}
-                  alt="Juego 2"
+                  alt="Hell is Us - Destacado"
                   className="d-block w-100"
                 />
               </Link>
@@ -58,7 +57,7 @@ export default function HomeCarousel() {
                   src="/dungeions.jpg"
                   width={900}
                   height={500}
-                  alt="Juego 3"
+                  alt="Dungeons and Dragons - Destacado"
                   className="d-block w-100"
                 />
               </Link>
