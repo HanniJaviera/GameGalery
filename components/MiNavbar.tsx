@@ -43,22 +43,14 @@ export default function MiNavbar() {
         {/* Usamos "d-flex align-items-center" de Bootstrap para alinearlos */}
         <div className="botones-container d-flex align-items-center">
           {/* Botón de Iniciar Sesión */}
-          <Button
-            as={Link}
-            href="/iniciarSesion"
-            className="btn-2" // Tu clase personalizada
-          >
-            Iniciar sesión
-          </Button>
+          <Link href="/iniciarSesion" legacyBehavior passHref>
+            <Button className="btn-2 ">Iniciar Sesion</Button>
+          </Link>
 
           {/* Botón de Registro */}
-          <Button
-            as={Link}
-            href="/registroUsuario"
-            className="btn-3 ms-2" // Tu clase + un margen
-          >
-            Registrar Usuario
-          </Button>
+          <Link href="/registroUsuario" legacyBehavior passHref>
+            <Button className="btn-3 ms-2">Registrar Usuario</Button>
+          </Link>
 
           {/* Icono de Carrito */}
           <Link href="/carritoCompra" className="cart-icon ms-3">
