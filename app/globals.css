@@ -297,6 +297,17 @@ body {
   border: none;
   /* Elimina los bordes */
   margin: 1px;
+  color: white;
+}
+
+.card .card-body {
+  color: black;
+}
+
+/* El 'h6' de precio en react-bootstrap a veces es 'text-muted', 
+   lo forzamos a ser blanco también */
+.card .card-body .text-muted {
+  color: #f0f0f0 !important; /* Un gris muy claro o blanco */
 }
 
 .card img {
@@ -488,3 +499,5 @@ footer {
   font-size: 30px;
   font-weight: normal;
 }
+
+/*BLOGS*/

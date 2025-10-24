@@ -24,13 +24,13 @@ export default function MiNavbar() {
             <Nav.Link as={Link} href="/">
               INICIO
             </Nav.Link>
-            <Nav.Link as={Link} href="/juegos">
+            <Nav.Link as={Link} href="/paginas/catalogo">
               JUEGOS
             </Nav.Link>
             <Nav.Link as={Link} href="/nosotros">
               NOSOTROS
             </Nav.Link>
-            <Nav.Link as={Link} href="/blogs">
+            <Nav.Link as={Link} href="/paginas/blog">
               BLOGS
             </Nav.Link>
             <Nav.Link as={Link} href="/contacto">
