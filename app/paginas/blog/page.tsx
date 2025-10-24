@@ -1,7 +1,6 @@
 import React from "react";
 
 //CSS
-
 // Componentes
 import MiNavbar from "../../../components/MiNavbar";
 import MiFooter from "../../../components/MiFooter";
@@ -24,15 +23,12 @@ const Page: React.FC = () => {
               noticias de marketing y otras novedades sobre la versión 3.7.
             </p>
             {/* Consejo: Reemplazar con <Link to="/blogs/honkai"> */}
-            <a href="/paginas/bloghonkai">
+            <a href="blog/bloghonkai">
               <button className="btn-ver-nt1">VER MÁS</button>
             </a>
           </div>
           <div className="noticia-imagen">
-            <img
-              src="https://fastcdn.hoyoverse.com/content-v2/hkrpg/159409/39aae3f9287ec90fd5f9d1dcbe113bad_1446011171349407682.jpg"
-              alt="Imagen noticia 1"
-            />
+            <img src="/hsrbanner37.jpg" alt="Imagen noticia 1" />
           </div>
         </section>
 
@@ -46,15 +42,12 @@ const Page: React.FC = () => {
               en todas las plataformas.
             </p>
             {/* Consejo: Reemplazar con <Link to="/blogs/silksong"> */}
-            <a href="/paginas/blogsilksong">
+            <a href="blog/blogsilksong">
               <button className="btn-ver-nt2">VER MÁS</button>
             </a>
           </div>
           <div className="noticia-imagen">
-            <img
-              src="https://lootlevelchill.com/wp-content/uploads/2025/04/Hollow-Knight-Silksong.webp"
-              alt="Imagen noticia 2"
-            />
+            <img src="/bannersilksong.jpg" alt="Imagen noticia 2" />
           </div>
         </section>
       </main>

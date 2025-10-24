@@ -501,3 +501,63 @@ footer {
 }
 
 /*BLOGS*/
+/*NOTICIAS*/
+.titulo-noticias {
+  text-align: center;
+  margin: 90px auto 30px;
+  max-width: 900px;
+  background: rgba(3, 3, 3, 0.493);
+  padding: 20px;
+  border-radius: 10px;
+  font-size: 29px;
+  font-weight: bold;
+  color: white;
+}
+
+.noticia {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 30px auto;
+  max-width: 900px;
+  background: rgba(3, 3, 3, 0.493);
+  padding: 20px;
+  border-radius: 10px;
+}
+
+.noticia-texto {
+  flex: 1;
+  margin-right: 20px;
+  color: white;
+}
+
+.noticia-texto h2 {
+  margin-bottom: 10px;
+}
+
+.noticia-imagen img {
+  width: 500px;
+  height: auto;
+  border-radius: 8px;
+}
+
+.btn-ver-nt1,
+.btn-ver-nt2 {
+  display: inline-block;
+  margin-top: 15px;
+  padding: 10px 20px;
+  border: 1px solid #333;
+  background: #000000;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: 0.3s;
+  color: white;
+}
+
+.btn-ver-nt1:hover,
+.btn-ver-nt2:hover {
+  background: #000000;
+  color: #fff;
+}
+
+/*FIN NOTICIAS*/

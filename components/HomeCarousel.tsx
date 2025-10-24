@@ -1,6 +1,6 @@
-// components/HomeCarousel.tsx
-"use client"; // ¡Importante! El carrusel es interactivo
+"use client"; // Para la interactividad del carrusel y botón
 
+// Imports necesarios
 import { Carousel, Button } from "react-bootstrap";
 import Link from "next/link";
 import Image from "next/image";
@@ -17,28 +17,38 @@ export default function HomeCarousel() {
             comunidad. No te pierdas las últimas novedades en la galería.
           </p>
 
-          {/* Botón/Link corregido */}
-          <Link href="/juegos" legacyBehavior passHref>
+          {/* Botón/Link corregido para ir al catálogo */}
+          <Link href="/paginas/catalogo" legacyBehavior passHref>
             <Button className="btn-1">Ver Productos</Button>
           </Link>
         </div>
 
         {/* Tu carrusel */}
         <div className="carousel-wrapper">
-          <Carousel id="customCarousel" interval={5000}>
+          {/* 2. Añadimos 'indicators={false}' y 'slide={false}' 
+                 para que coincida con tu CSS original */}
+          <Carousel
+            id="customCarousel"
+            interval={5000}
+            indicators={false}
+            slide={false}
+          >
+            {/* Primer Slide */}
             <Carousel.Item>
               <Link href="/infohollowknight">
                 <Image
                   src="/hollowknight.jpg"
                   width={900}
                   height={500}
-                  alt="Hollow Knight - Destacado" // Alt descriptivo
+                  alt="Hollow Knight - Destacado"
                   className="d-block w-100"
                   priority
                 />
               </Link>
+              {/* 3. Hemos quitado el Carousel.Caption para que coincida con tu HTML */}
             </Carousel.Item>
 
+            {/* Segundo Slide */}
             <Carousel.Item>
               <Link href="/">
                 <Image
@@ -51,13 +61,14 @@ export default function HomeCarousel() {
               </Link>
             </Carousel.Item>
 
+            {/* Tercer Slide */}
             <Carousel.Item>
               <Link href="/infodungeons">
                 <Image
                   src="/dungeions.jpg"
                   width={900}
                   height={500}
-                  alt="Dungeons and Dragons - Destacado"
+                  alt="Dungeons - Destacado"
                   className="d-block w-100"
                 />
               </Link>
