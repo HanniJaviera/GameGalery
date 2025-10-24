@@ -110,54 +110,57 @@ body {
 }
 
 /* ===== BOTONES ===== */
-/* Contenedor de los botones */
+/* INICIAR SESION */
 .botones-container {
   display: flex;
   align-items: center;
   gap: 10px;
 }
 
-/* INICIAR SESIÓN */
-.btn-2 {
-  background-color: #ffffff;
-  color: #000;
-  padding: 1px 10px;
+.btn.btn-2 {
+  background-color: #ffffff !important; /* Asegura que se anule el color de Bootstrap */
+  color: #000 !important; /* Asegura el color del texto */
+  padding: 5px 12px;
   border-radius: 5px;
+  border: 2px solid #000 !important; /* Asegura que el borde no sea el de Bootstrap */
   cursor: pointer;
   font-weight: bold;
   transition: 0.3s;
-  border: 2px solid #000;
+  text-decoration: none;
+  display: inline-block;
 }
 
-.btn-2:hover {
-  background-color: #1a1917;
-  color: #fff;
+.btn.btn-2:hover {
+  background-color: #1a1917 !important;
+  color: #fff !important;
 }
 
 /* REGISTRAR USUARIO */
-.btn-3 {
-  background-color: #ffffff;
-  color: #000;
-  padding: 1px 20px;
+.btn.btn-3 {
+  background-color: #ffffff !important;
+  color: #000 !important;
+  padding: 5px 12px;
   border-radius: 5px;
+  border: 2px solid #000 !important;
   cursor: pointer;
   font-weight: bold;
   transition: 0.3s;
-  border: 2px solid #000;
+  text-decoration: none;
+  display: inline-block;
 }
 
-.btn-3:hover {
-  background-color: #1a1917;
-  color: #fff;
+.btn.btn-3:hover {
+  background-color: #1a1917 !important;
+  color: #fff !important;
 }
 
 /* CARRITO */
 .cart-icon {
-  background-color: #ffffff;
-  color: #000;
-  padding: 5px 12px;
+  background-color: #fcfcfc !important;
+  color: #000 !important;
+  padding: 5px 12px !important;
   border-radius: 5px;
-  border: 2px solid #000;
+  border: 2px solid #000 !important;
   cursor: pointer;
   font-weight: bold;
   transition: 0.3s;
@@ -166,22 +169,21 @@ body {
 }
 
 .cart-icon:hover {
-  background-color: #1a1917;
-  color: #fff;
+  background-color: #1a1917b6 !important;
+  color: #fff !important;
 }
-
 .btn-primary {
   display: flex;
   justify-content: center;
-  background-color: #ffffff;
-  border: 1px solid black;
+  background-color: #ffffff !important;
+  border: 1px solid black !important;
   align-items: center;
-  color: black;
+  color: black !important;
 }
 
 .btn-primary:hover {
-  background-color: #1a1917;
-  border: white;
+  background-color: #1a1917 !important;
+  border: white !important;
 }
 
 .card-title {
