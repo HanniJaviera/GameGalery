@@ -9,6 +9,7 @@ const NosotrosPage: React.FC = () => {
         <section className="nosotros">
           <div className="nosotros-texto">
             <h2>GAME GALERY</h2>
+
             <p>
               En Game Gallery, nuestra misión es conectar a los jugadores con
               las mejores experiencias de videojuegos del mundo. Fundada en
