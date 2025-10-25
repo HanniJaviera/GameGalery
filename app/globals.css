@@ -561,3 +561,164 @@ footer {
 }
 
 /*FIN NOTICIAS*/
+
+/*BLOGS DETALLES*/
+.blog-detalle {
+  max-width: 900px;
+  margin: 100px auto 50px auto;
+  /* separa del header con 100px */
+  padding: 20px;
+  background-color: rgba(3, 3, 3, 0.493);
+  border-radius: 10px;
+  color: white;
+  line-height: 1.6;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
+}
+
+/* Imagen destacada del blog */
+.blog-detalle img {
+  width: 100%;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  border: 2px solid #000;
+}
+
+/* Título */
+.blog-detalle h2 {
+  font-size: 2.5rem;
+  margin-bottom: 20px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+  font-family: "Jersey 10", sans-serif;
+}
+
+/* Párrafos */
+.blog-detalle p {
+  margin-bottom: 15px;
+  font-size: 1.1rem;
+}
+
+/* Botón volver */
+.btn-volver {
+  display: inline-block;
+  background-color: #fff;
+  color: #000;
+  padding: 8px 20px;
+  border-radius: 5px;
+  border: 2px solid #000;
+  font-weight: bold;
+  text-decoration: none;
+  transition: 0.3s;
+  margin-top: 20px;
+}
+
+.btn-volver:hover {
+  background-color: #000000;
+  color: #fff;
+}
+
+/*Parte de la nueva version*/
+.blog-seccion {
+  background-color: rgba(0, 0, 0, 0.4);
+  /* Fondo semitransparente */
+  padding: 20px;
+  border-radius: 10px;
+  margin: 30px 0;
+}
+
+.blog-seccion h3 {
+  font-size: 2rem;
+  margin-bottom: 20px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+  font-family: "Jersey 10", sans-serif;
+  color: #fff;
+  /* Asegura que el texto sea blanco sobre el fondo oscuro */
+}
+
+/*Comentarios*/
+
+.comentarios {
+  margin-top: 40px;
+  padding: 20px;
+  background-color: rgba(3, 3, 3, 0.493);
+  border-radius: 10px;
+  color: white;
+}
+
+.comentarios h3 {
+  margin-bottom: 20px;
+  font-size: 2rem;
+  margin-bottom: 20px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+  font-family: "Jersey 10", sans-serif;
+  color: #fff;
+  /* Texto blanco sobre fondo oscuro */
+}
+
+.form-comentarios input,
+.form-comentarios textarea {
+  width: 100%;
+  padding: 8px;
+  background-color: #fff;
+  border: 2px solid #000;
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
+
+/*Comentarios*/
+.comentario {
+  display: flex;
+  /* fila principal */
+  gap: 10px;
+  /* espacio entre foto y contenido */
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  max-width: 400px;
+  align-items: flex-start;
+  /* evita que la foto se estire verticalmente */
+}
+
+.foto-perfil {
+  width: 80px;
+  height: 50px;
+  /* tamaño fijo */
+  border-radius: 50%;
+  object-fit: cover;
+  /* para que la imagen mantenga proporción */
+}
+
+.contenido-comentario {
+  display: flex;
+  flex-direction: column;
+}
+
+.nombre-usuario {
+  font-weight: bold;
+}
+
+p {
+  margin: 5px 0;
+  /* Separación entre nombre y comentario */
+}
+
+.acciones {
+  font-size: 12px;
+  color: gray;
+}
+
+.btn-2 {
+  background-color: #ffffff;
+  color: #000;
+  padding: 5px 15px;
+  border-radius: 5px;
+  border: 2px solid #000;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.btn-2:hover {
+  background-color: #1a1917;
+  color: #fff;
+}
+
+/*Comentarios*/

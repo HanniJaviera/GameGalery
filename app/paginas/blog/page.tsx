@@ -23,7 +23,7 @@ const Page: React.FC = () => {
               noticias de marketing y otras novedades sobre la versión 3.7.
             </p>
             {/* Consejo: Reemplazar con <Link to="/blogs/honkai"> */}
-            <a href="blog/bloghonkai">
+            <a href="/paginas/blog/honkaistarrail">
               <button className="btn-ver-nt1">VER MÁS</button>
             </a>
           </div>
@@ -42,7 +42,7 @@ const Page: React.FC = () => {
               en todas las plataformas.
             </p>
             {/* Consejo: Reemplazar con <Link to="/blogs/silksong"> */}
-            <a href="blog/blogsilksong">
+            <a href="/paginas/blog/silksong">
               <button className="btn-ver-nt2">VER MÁS</button>
             </a>
           </div>
