@@ -17,23 +17,18 @@ export default function HomeCarousel() {
             comunidad. No te pierdas las últimas novedades en la galería.
           </p>
 
-          {/* Botón/Link corregido para ir al catálogo */}
           <Link href="/paginas/catalogo" legacyBehavior passHref>
             <Button className="btn-1">Ver Productos</Button>
           </Link>
         </div>
 
-        {/* Tu carrusel */}
         <div className="carousel-wrapper">
-          {/* 2. Añadimos 'indicators={false}' y 'slide={false}' 
-                 para que coincida con tu CSS original */}
           <Carousel
             id="customCarousel"
             interval={5000}
             indicators={false}
             slide={false}
           >
-            {/* Primer Slide */}
             <Carousel.Item>
               <Link href="/infohollowknight">
                 <Image
@@ -45,10 +40,8 @@ export default function HomeCarousel() {
                   priority
                 />
               </Link>
-              {/* 3. Hemos quitado el Carousel.Caption para que coincida con tu HTML */}
             </Carousel.Item>
 
-            {/* Segundo Slide */}
             <Carousel.Item>
               <Link href="/">
                 <Image
@@ -60,8 +53,6 @@ export default function HomeCarousel() {
                 />
               </Link>
             </Carousel.Item>
-
-            {/* Tercer Slide */}
             <Carousel.Item>
               <Link href="/infodungeons">
                 <Image
