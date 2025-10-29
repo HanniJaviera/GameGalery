@@ -36,7 +36,7 @@ export default function MiNavbar() {
             <Nav.Link as={Link} href="/paginas/blog">
               BLOGS
             </Nav.Link>
-            <Nav.Link as={Link} href="/contacto">
+            <Nav.Link as={Link} href="/paginas/contacto">
               CONTACTO
             </Nav.Link>
           </Nav>
@@ -46,12 +46,12 @@ export default function MiNavbar() {
         {/* Usamos "d-flex align-items-center" de Bootstrap para alinearlos */}
         <div className="botones-container d-flex align-items-center">
           {/* Botón de Iniciar Sesión */}
-          <Link href="/iniciarSesion" legacyBehavior passHref>
+          <Link href="paginas/iniciarsesion" legacyBehavior passHref>
             <Button className="btn-2 ">Iniciar Sesion</Button>
           </Link>
 
           {/* Botón de Registro */}
-          <Link href="/registroUsuario" legacyBehavior passHref>
+          <Link href="paginas/registrase" legacyBehavior passHref>
             <Button className="btn-3 ms-2">Registrar Usuario</Button>
           </Link>
 

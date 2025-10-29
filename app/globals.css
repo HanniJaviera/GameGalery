@@ -722,3 +722,250 @@ p {
 }
 
 /*Comentarios*/
+
+/*REGISTRAR USUARIO*/
+/* ----- CONTENEDOR PRINCIPAL DE REGISTRO ----- */
+.registro-container {
+  max-width: 400px;
+  margin: 80px auto;
+  background-color: rgba(3, 3, 3, 0.493);
+  padding: 40px;
+  border-radius: 12px;
+  text-align: center;
+  color: white;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* ----- LOGO Y ENCABEZADO ----- */
+.logo-container {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.logo {
+  width: 120px;
+  height: auto;
+}
+
+.company-name {
+  font-size: 24px;
+  font-weight: bold;
+  margin-top: 10px;
+  color: white;
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* ----- FORMULARIO DE REGISTRO ----- */
+form {
+  max-width: 100%;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+/* Aplica tanto a inputs como selects dentro del formulario con id="registerForm" */
+#registerForm input,
+#registerForm select {
+  width: 100%;
+  padding: 8px;
+  margin: 8px 0;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 14px;
+}
+
+/* ----- BOTÓN DE ENVÍO ----- */
+button {
+  padding: 10px;
+  background-color: #000;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.2s ease;
+}
+
+button:hover {
+  background-color: #333;
+}
+
+/* ----- MENSAJES DE ERROR ----- */
+.error {
+  color: red;
+  font-size: 12px;
+  margin-top: -5px;
+}
+
+/* ----- ENLACES ----- */
+.registro-container a {
+  color: #00bfff;
+  text-decoration: none;
+}
+
+.registro-container a:hover {
+  text-decoration: underline;
+}
+/* ----- FORMULARIO DE REGISTRO ----- */
+
+/* ----- CONTENEDOR PRINCIPAL DE INICIO DE SESIÓN ----- */
+.inicio-container {
+  max-width: 400px;
+  margin: 80px auto;
+  background-color: rgba(3, 3, 3, 0.493);
+  padding: 40px;
+  border-radius: 12px;
+  text-align: center;
+  color: white;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* ----- LOGO Y ENCABEZADO ----- */
+.logo-container {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.logo {
+  width: 120px;
+  height: auto;
+}
+
+.company-name {
+  font-size: 24px;
+  font-weight: bold;
+  margin-top: 10px;
+  color: white;
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* ----- FORMULARIO DE LOGIN ----- */
+form {
+  max-width: 100%;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+input {
+  padding: 8px;
+  margin: 8px 0;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 14px;
+}
+
+/* ----- BOTÓN ----- */
+button {
+  padding: 10px;
+  background-color: #000;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.2s ease;
+}
+
+button:hover {
+  background-color: #333;
+}
+
+/* ----- MENSAJES DE ERROR ----- */
+.error {
+  color: red;
+  font-size: 12px;
+  margin-top: -5px;
+}
+
+/* ----- ENLACES ----- */
+.inicio-container a {
+  color: #00bfff;
+  text-decoration: none;
+}
+
+.inicio-container a:hover {
+  text-decoration: underline;
+}
+
+/* ----- CONTENEDOR PRINCIPAL DEL FORMULARIO DE CONTACTO ----- */
+.contact-container {
+  max-width: 400px;
+  margin: 80px auto;
+  background-color: rgba(3, 3, 3, 0.493);
+  padding: 40px;
+  border-radius: 12px;
+  text-align: center;
+  color: white;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* ----- ENCABEZADO CON LOGO ----- */
+.contact-header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.contact-header img.logo {
+  width: 80px;
+  height: auto;
+  margin-bottom: 10px;
+}
+
+.contact-header h2 {
+  margin-bottom: 20px;
+  font-size: 22px;
+  color: white;
+}
+
+/* ----- FORMULARIO ----- */
+.contact-form {
+  text-align: left;
+}
+
+.contact-form label {
+  display: block;
+  margin-top: 10px;
+  margin-bottom: 5px;
+  font-weight: bold;
+  color: white;
+}
+
+.contact-form input,
+.contact-form textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 14px;
+  resize: vertical;
+}
+
+/* ----- BOTÓN ENVIAR ----- */
+.btn-enviar {
+  margin-top: 15px;
+  background-color: #000;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  width: 100%;
+  font-size: 16px;
+  font-weight: bold;
+  transition: background-color 0.2s ease;
+}
+
+.btn-enviar:hover {
+  background-color: #333;
+}
