@@ -965,3 +965,84 @@ button:hover {
 .btn-enviar:hover {
   background-color: #333;
 }
+
+/* ==== Banner superior de categoría ==== */
+.categoria-banner {
+  background-size: cover;
+  background-position: center;
+  height: 250px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 2rem;
+  font-weight: bold;
+  text-shadow: 2px 2px 5px black;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  transition: background-image 0.5s ease-in-out;
+}
+
+/* ==== Botones de categorías ==== */
+.categorias {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.categoria-btn {
+  background-color: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.categoria-btn:hover {
+  background-color: rgba(255, 255, 255, 0.4);
+}
+
+.categoria-btn.activa {
+  background-color: #040404;
+  color: white;
+}
+
+/* ==== Tarjetas de video juegos ==== */
+.row {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.card {
+  background-color: rgba(0, 0, 0, 0.705) !important;
+  border: none;
+  margin: 1px;
+  color: white;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+  transform: scale(1.03);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.7);
+}
+
+.card .card-body {
+  color: white;
+}
+
+.card .card-body .text-muted {
+  color: #f0f0f0 !important;
+}
+
+.card img {
+  border-top: 10px solid #007bff00;
+  border-radius: 8px 8px 0 0;
+}

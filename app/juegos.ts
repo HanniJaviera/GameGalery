@@ -5,10 +5,10 @@ export interface Juego {
   price: number;
   imageSrc: string; // Ruta de la imagen en /public
   infoPage: string; // Ruta interna de Next.js
+  categoria: string; // categoría agregada
 }
 
-// 2. Creamos la lista de juegos (asegúrate que las rutas de imagen sean correctas)
-// (Usé los datos y rutas que me pasaste)
+// 2. Lista completa de juegos con sus categorías
 export const juegosData: Juego[] = [
   {
     id: 1,
@@ -16,6 +16,7 @@ export const juegosData: Juego[] = [
     price: 59.99,
     imageSrc: "/doom.avif",
     infoPage: "/info/doom",
+    categoria: "Shooter",
   },
   {
     id: 2,
@@ -23,6 +24,7 @@ export const juegosData: Juego[] = [
     price: 12.6,
     imageSrc: "/dbd.jpg",
     infoPage: "/info/dbd",
+    categoria: "Terror",
   },
   {
     id: 3,
@@ -30,6 +32,7 @@ export const juegosData: Juego[] = [
     price: 19.99,
     imageSrc: "/haloinfite.jpg",
     infoPage: "/info/halo",
+    categoria: "Shooter",
   },
   {
     id: 4,
@@ -37,6 +40,7 @@ export const juegosData: Juego[] = [
     price: 4.6,
     imageSrc: "/peak.jpg",
     infoPage: "/info/peak",
+    categoria: "Indie",
   },
   {
     id: 5,
@@ -44,6 +48,7 @@ export const juegosData: Juego[] = [
     price: 14.6,
     imageSrc: "/hollowknight.jpg",
     infoPage: "/info/hollowknight",
+    categoria: "Aventura",
   },
   {
     id: 6,
@@ -51,13 +56,15 @@ export const juegosData: Juego[] = [
     price: 15.23,
     imageSrc: "/counterstrike.jpg",
     infoPage: "/info/cs2",
+    categoria: "Shooter",
   },
   {
     id: 7,
     title: "NBA 2K26",
     price: 73.54,
-    imageSrc: "/NBA.jpg", // Asumí que las rutas que tenías están bien
+    imageSrc: "/NBA.jpg",
     infoPage: "/info/nba",
+    categoria: "Deportes",
   },
   {
     id: 8,
@@ -65,6 +72,7 @@ export const juegosData: Juego[] = [
     price: 52.53,
     imageSrc: "/metalgear.jpg",
     infoPage: "/info/metalgear",
+    categoria: "Acción",
   },
   {
     id: 9,
@@ -72,6 +80,7 @@ export const juegosData: Juego[] = [
     price: 66.19,
     imageSrc: "/bonder.jpg",
     infoPage: "/info/borderlands",
+    categoria: "Acción",
   },
   {
     id: 10,
@@ -79,6 +88,7 @@ export const juegosData: Juego[] = [
     price: 33.31,
     imageSrc: "/hellisus.jpg",
     infoPage: "/info/hellisus",
+    categoria: "Acción",
   },
   {
     id: 11,
@@ -86,5 +96,6 @@ export const juegosData: Juego[] = [
     price: 14.66,
     imageSrc: "/dungeions.jpg",
     infoPage: "/info/dungeons",
+    categoria: "RPG",
   },
 ];
