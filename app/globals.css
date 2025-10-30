@@ -292,20 +292,16 @@ body {
 }
 
 .card {
-  /* Establece un fondo blanco con un 70% de opacidad */
-  background-color: rgba(0, 0, 0, 0.705);
+  background-color: rgba(0, 0, 0, 0.705) !important;
   border: none;
-  /* Elimina los bordes */
   margin: 1px;
   color: white;
 }
 
 .card .card-body {
-  color: black;
+  color: white;
 }
 
-/* El 'h6' de precio en react-bootstrap a veces es 'text-muted', 
-   lo forzamos a ser blanco también */
 .card .card-body .text-muted {
   color: #f0f0f0 !important; /* Un gris muy claro o blanco */
 }
