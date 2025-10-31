@@ -8,15 +8,10 @@ import { notFound, useRouter, useParams } from "next/navigation";
 import { juegosData, Juego } from "../../../juegos";
 import GameCard from "../../../../components/GameCard";
 
-// --- Declaraciones Globales (para TypeScript) ---
-declare const __app_id: string;
-declare const __firebase_config: string;
-declare const __initial_auth_token: string;
-
 export default function JuegoDetallePage() {
-  const router = useRouter(); 
+  const router = useRouter();
   const params = useParams();
-  const slug = params.slug as string; 
+  const slug = params.slug as string;
   const juego: Juego | undefined = juegosData.find(
     (j) => j.infoPage === `/paginas/info/${slug}`
   );
@@ -53,7 +48,7 @@ export default function JuegoDetallePage() {
     // 5. Guardamos el carrito actualizado en localStorage
     localStorage.setItem("carrito", JSON.stringify(carritoActual));
 
-    // 6. Opcional: Actualizamos el contador del Navbar 
+    // 6. Opcional: Actualizamos el contador del Navbar
     window.dispatchEvent(new Event("storage")); // Avisa a otros componentes (como el navbar)
 
     // 7. Redirigimos al carrito
