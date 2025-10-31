@@ -1,6 +1,5 @@
-"use client"; // Para la interactividad del carrusel y botón
+"use client";
 
-// Imports necesarios
 import { Carousel, Button } from "react-bootstrap";
 import Link from "next/link";
 import Image from "next/image";
@@ -9,7 +8,6 @@ export default function HomeCarousel() {
   return (
     <div className="main-container">
       <div className="row">
-        {/* Tu sección de texto */}
         <div className="text-content">
           <h3>¡Destacados de la semana!</h3>
           <p>

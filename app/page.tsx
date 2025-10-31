@@ -1,18 +1,16 @@
 "use client";
 import Link from "next/link";
-import HomeCarousel from "../components/HomeCarousel"; // Importa tu carrusel
-import GameCard from "../components/GameCard"; // 1. IMPORTAMOS EL GAMECARD
-import { juegosData } from "../app/juegos"; // 2. IMPORTAMOS LOS DATOS
+import { Container, Row } from "react-bootstrap";
+import HomeCarousel from "../components/HomeCarousel";
+import GameCard from "../components/GameCard";
+import { juegosData } from "../app/juegos";
 
-// --- 1. COMPONENTE BANNER (sin cambios) ---
 function Banner() {
   return (
     <Link href="/info/borderlands" className="header-link">
       {" "}
-      {/* Ruta actualizada */}
       <header className="header">
         <video autoPlay muted loop className="video-background">
-          {/* Asegúrate que este video esté en /public/videoheader.webm */}
           <source src="/videoheader.webm" type="video/webm" />
           Tu navegador no soporta el video.
         </video>
@@ -21,25 +19,23 @@ function Banner() {
   );
 }
 
-// --- 2. COMPONENTE LISTA DE TARJETAS (REFACTORIZADO) ---
 function ProductCards() {
-  // 3. Tomamos solo los primeros 8 juegos para la página de inicio
   const featuredGames = juegosData.slice(0, 8);
 
   return (
-    <div className="container my-5">
-      <h2 className="text-center mb-4">Juegos Destacados</h2>
-      <div className="row">
-        {/* 4. Mapeamos los juegos y creamos una GameCard para cada uno */}
-        {featuredGames.map((juegos) => (
-          <GameCard key={juegos.id} juego={juegos} />
+    <Container className="my-5 pt-5">
+      <h2 className="mb-4 text-center text-white">Juegos Destacados</h2> 
+      <Row className="justify-content-center g-4">
+        {featuredGames.map((juego) => (
+          <div key={juego.id} className="col-lg-3 col-md-4 col-sm-6">
+            <GameCard juego={juego} />
+          </div>
         ))}
-      </div>
-    </div>
+      </Row>
+    </Container>
   );
 }
 
-// --- PÁGINA PRINCIPAL (Home) ---
 export default function Home() {
   return (
     <>

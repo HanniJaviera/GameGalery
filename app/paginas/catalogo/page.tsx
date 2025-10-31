@@ -1,5 +1,4 @@
 "use client";
-// Importamos los componentes que necesitamos
 import GameCard from "../../../components/GameCard";
 import { juegosData } from "../../juegos";
 import { Container, Row, Col } from "react-bootstrap";

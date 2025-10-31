@@ -1,15 +1,39 @@
-// components/MiNavbar.tsx
-"use client"; // Necesario para la interactividad (menú hamburguesa)
-
+"use client";
+import { useState, useEffect } from "react";
 import { Navbar, Nav, Container, Button } from "react-bootstrap";
 import Link from "next/link";
 
 export default function MiNavbar() {
+  const [cartCount, setCartCount] = useState(0);
+
+  const updateCartCount = () => {
+    if (typeof window !== "undefined") {
+      const carrito = JSON.parse(localStorage.getItem("carrito") || "[]");
+      const totalItems = carrito.reduce(
+        (acc: number, item: { cantidad: number }) => acc + (item.cantidad || 0),
+        0
+      );
+      setCartCount(totalItems);
+    }
+  };
+
+  useEffect(() => {
+    updateCartCount();
+
+    const handleStorageChange = () => {
+      updateCartCount();
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+    };
+  }, []);
+
   return (
-    // Usamos las clases de tu HTML: fixed="top" y className para las tuyas
     <Navbar expand="lg" fixed="top" className="navbar-white navbar-transparent">
       <Container fluid>
-        {/* Brand/Logo: Usamos "as={Link}" para que sea un link de Next.js */}
         <Navbar.Brand as={Link} href="/" className="jersey-10-regular">
           GAME GALERY
         </Navbar.Brand>
@@ -30,7 +54,7 @@ export default function MiNavbar() {
             <Nav.Link as={Link} href="/paginas/catalogo">
               JUEGOS
             </Nav.Link>
-            <Nav.Link as={Link} href="paginas/nosotros">
+            <Nav.Link as={Link} href="/paginas/nosotros">
               NOSOTROS
             </Nav.Link>
             <Nav.Link as={Link} href="/paginas/blog">
@@ -42,22 +66,20 @@ export default function MiNavbar() {
           </Nav>
         </Navbar.Collapse>
 
-        {/* Contenedor de Botones y Carrito */}
-        {/* Usamos "d-flex align-items-center" de Bootstrap para alinearlos */}
         <div className="botones-container d-flex align-items-center">
           {/* Botón de Iniciar Sesión */}
-          <Link href="paginas/iniciarsesion" legacyBehavior passHref>
+          <Link href="/paginas/iniciarsesion" legacyBehavior passHref>
             <Button className="btn-2 ">Iniciar Sesion</Button>
           </Link>
 
-          {/* Botón de Registro */}
-          <Link href="paginas/registrase" legacyBehavior passHref>
+          {/* Botón de Registro  */}
+          <Link href="/paginas/registrarse" legacyBehavior passHref>
             <Button className="btn-3 ms-2">Registrar Usuario</Button>
           </Link>
 
           {/* Icono de Carrito */}
-          <Link href="/carritoCompra" className="cart-icon ms-3">
-            🛒 Cart (<span id="cart-count">0</span>)
+          <Link href="/paginas/carrito" className="cart-icon ms-3">
+            🛒 Cart (<span id="cart-count">{cartCount}</span>)
           </Link>
         </div>
       </Container>

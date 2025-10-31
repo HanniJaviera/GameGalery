@@ -1,5 +1,11 @@
 @import url("https://fonts.googleapis.com/css2?family=Jersey+10&display=swap");
 
+/* 1. Esta regla FUERZA a Bootstrap a usar tu color para TODAS las tarjetas */
+:root {
+  /* Mantenemos esto como primera línea de defensa */
+  --bs-card-bg: rgba(0, 0, 0, 0.705) !important;
+}
+
 .jersey-10-regular {
   font-family: "Jersey 10", sans-serif;
   font-weight: 400;
@@ -49,32 +55,23 @@ body {
   min-height: 40vh;
   padding: 80px 0;
   color: white;
-
-  /* Aplica Flexbox para alinear los elementos a la izquierda */
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  /* Alinea los hijos verticalmente en la parte superior */
   align-items: flex-start;
-  /* Esto es lo que necesitas para alinear todo a la izquierda */
 }
 
 .header-content.container {
-  /* No necesitas `align-self` si ya alineas el padre. */
   padding: 0;
   width: 100%;
-  /* Asegúrate de que ocupe todo el ancho. */
 }
 
 .header-link {
   text-decoration: none;
-  /* Elimina el subrayado del enlace */
   color: inherit;
-  /* Mantiene el color del texto original */
 }
 
 .botones-container {
-  /* Mantienes el estilo para los botones en la esquina superior derecha */
   width: 100%;
   display: flex;
   justify-content: flex-end;
@@ -82,7 +79,6 @@ body {
 }
 
 .video-background {
-  /* Propiedades para el video */
   position: absolute;
   top: 0;
   left: 0;
@@ -110,7 +106,6 @@ body {
 }
 
 /* ===== BOTONES ===== */
-/* INICIAR SESION */
 .botones-container {
   display: flex;
   align-items: center;
@@ -118,11 +113,11 @@ body {
 }
 
 .btn.btn-2 {
-  background-color: #ffffff !important; /* Asegura que se anule el color de Bootstrap */
-  color: #000 !important; /* Asegura el color del texto */
+  background-color: #ffffff !important;
+  color: #000 !important;
   padding: 5px 12px;
   border-radius: 5px;
-  border: 2px solid #000 !important; /* Asegura que el borde no sea el de Bootstrap */
+  border: 2px solid #000 !important;
   cursor: pointer;
   font-weight: bold;
   transition: 0.3s;
@@ -135,7 +130,6 @@ body {
   color: #fff !important;
 }
 
-/* REGISTRAR USUARIO */
 .btn.btn-3 {
   background-color: #ffffff !important;
   color: #000 !important;
@@ -154,7 +148,6 @@ body {
   color: #fff !important;
 }
 
-/* CARRITO */
 .cart-icon {
   background-color: #fcfcfc !important;
   color: #000 !important;
@@ -189,17 +182,15 @@ body {
 .card-title {
   display: flex;
   justify-content: center;
-  color: white;
+  color: white !important; /* Añadido !important */
 }
 
-/*     Carrusel    */
+/* Carrusel */
 
 .carousel-wrapper {
   max-width: 600px;
   margin-right: 40px;
-  /* Empuja el contenedor a la izquierda */
   margin-left: auto;
-  /* Agrega un margen de 20px a la izquierda */
   position: relative;
 }
 
@@ -207,28 +198,21 @@ body {
   margin: 0 auto;
   position: relative;
   display: flex;
-  /* Alinea el carrusel y el contenido en una fila */
   background: #1b2838;
-  /* Color de fondo oscuro */
   border-radius: 5px;
   overflow: hidden;
-  /* Oculta el contenido que se salga del contenedor */
 }
 
 .carousel-inner {
   flex: 1;
-  /* Ocupa el espacio restante */
 }
 
 .text-content {
   max-width: 600px;
   margin-right: auto;
-  /* Empuja el contenedor a la izquierda */
   margin-left: 100px;
-  /* Agrega un margen de 20px a la izquierda */
   margin-top: 100px;
   color: white;
-
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -236,7 +220,6 @@ body {
 
 .info-content {
   width: 300px;
-  /* Ancho fijo para el panel de la derecha */
   padding: 20px;
   color: white;
   display: flex;
@@ -262,23 +245,19 @@ body {
 
 .carousel-item {
   transition: none ease-in-out !important;
-  /* la transición dure 0.5 segundos */
 }
 
 .username,
 .phone-number {
   margin: 0;
-  /* Elimina el margen por defecto de los párrafos */
   font-size: 14px;
 }
 
 .main-container {
-  max-width: 1600px;
+  max-width: 1400px;
   margin: 20px auto;
-  /* lo centra en la página */
   border-radius: 5px;
   background-color: rgba(3, 3, 3, 0.493);
-  /* opacidad del 80% */
   padding: 70px;
 }
 
@@ -288,27 +267,40 @@ body {
   justify-content: center;
   flex-wrap: wrap;
   gap: 20px;
-  /* añade espacio entre las tarjetas en ambas direcciones */
 }
 
+/* 2. REGLA .CARD MÁS AGRESIVA */
 .card {
-  background-color: rgba(0, 0, 0, 0.705) !important;
+  background-color: rgba(
+    0,
+    0,
+    0,
+    0.705
+  ) !important; /* AÑADIDO DE VUELTA con !important */
   border: none;
   margin: 1px;
-  color: white;
+  color: white !important; /* Añadido !important */
+  border-radius: 8px;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+  transform: scale(1.03);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.7);
 }
 
 .card .card-body {
-  color: white;
+  color: white !important; /* Añadido !important */
 }
 
 .card .card-body .text-muted {
-  color: #f0f0f0 !important; /* Un gris muy claro o blanco */
+  color: #f0f0f0 !important; /* Esto ya estaba, es correcto */
 }
 
 .card img {
   border-top: 10px solid #007bff00;
-  /* Borde superior de la imagen */
+  border-radius: 8px 8px 0 0;
 }
 
 /* Footer */
@@ -359,7 +351,6 @@ footer {
   display: flex;
   flex-direction: column;
   align-items: center;
-  /* Centra el grupo de contacto */
   gap: 5px;
 }
 
@@ -372,7 +363,6 @@ footer {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  /* Alinea el contenido a la derecha */
   gap: 10px;
 }
 
@@ -403,7 +393,7 @@ footer {
   margin-top: 70px;
 }
 
-/*  Nosotros */
+/* Nosotros */
 .titulo-nosotros {
   text-align: center;
   margin: 90px auto 30px;
@@ -469,7 +459,6 @@ footer {
   justify-content: space-between;
   align-items: center;
   gap: 40px;
-  /* espacio entre imágenes */
 }
 
 .dev {
@@ -481,7 +470,6 @@ footer {
   height: 310px;
   object-fit: cover;
   border-radius: 5%;
-  /* círculo */
   border: 2px solid #fff;
   transition: transform 0.3s ease;
 }
@@ -562,7 +550,6 @@ footer {
 .blog-detalle {
   max-width: 900px;
   margin: 100px auto 50px auto;
-  /* separa del header con 100px */
   padding: 20px;
   background-color: rgba(3, 3, 3, 0.493);
   border-radius: 10px;
@@ -571,7 +558,6 @@ footer {
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
 }
 
-/* Imagen destacada del blog */
 .blog-detalle img {
   width: 100%;
   border-radius: 10px;
@@ -579,7 +565,6 @@ footer {
   border: 2px solid #000;
 }
 
-/* Título */
 .blog-detalle h2 {
   font-size: 2.5rem;
   margin-bottom: 20px;
@@ -587,13 +572,11 @@ footer {
   font-family: "Jersey 10", sans-serif;
 }
 
-/* Párrafos */
 .blog-detalle p {
   margin-bottom: 15px;
   font-size: 1.1rem;
 }
 
-/* Botón volver */
 .btn-volver {
   display: inline-block;
   background-color: #fff;
@@ -612,10 +595,8 @@ footer {
   color: #fff;
 }
 
-/*Parte de la nueva version*/
 .blog-seccion {
   background-color: rgba(0, 0, 0, 0.4);
-  /* Fondo semitransparente */
   padding: 20px;
   border-radius: 10px;
   margin: 30px 0;
@@ -627,7 +608,6 @@ footer {
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
   font-family: "Jersey 10", sans-serif;
   color: #fff;
-  /* Asegura que el texto sea blanco sobre el fondo oscuro */
 }
 
 /*Comentarios*/
@@ -647,7 +627,6 @@ footer {
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
   font-family: "Jersey 10", sans-serif;
   color: #fff;
-  /* Texto blanco sobre fondo oscuro */
 }
 
 .form-comentarios input,
@@ -660,27 +639,21 @@ footer {
   margin-bottom: 10px;
 }
 
-/*Comentarios*/
 .comentario {
   display: flex;
-  /* fila principal */
   gap: 10px;
-  /* espacio entre foto y contenido */
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 8px;
   max-width: 400px;
   align-items: flex-start;
-  /* evita que la foto se estire verticalmente */
 }
 
 .foto-perfil {
   width: 80px;
   height: 50px;
-  /* tamaño fijo */
   border-radius: 50%;
   object-fit: cover;
-  /* para que la imagen mantenga proporción */
 }
 
 .contenido-comentario {
@@ -694,7 +667,6 @@ footer {
 
 p {
   margin: 5px 0;
-  /* Separación entre nombre y comentario */
 }
 
 .acciones {
@@ -702,25 +674,7 @@ p {
   color: gray;
 }
 
-.btn-2 {
-  background-color: #ffffff;
-  color: #000;
-  padding: 5px 15px;
-  border-radius: 5px;
-  border: 2px solid #000;
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-.btn-2:hover {
-  background-color: #1a1917;
-  color: #fff;
-}
-
-/*Comentarios*/
-
 /*REGISTRAR USUARIO*/
-/* ----- CONTENEDOR PRINCIPAL DE REGISTRO ----- */
 .registro-container {
   max-width: 400px;
   margin: 80px auto;
@@ -732,7 +686,6 @@ p {
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
-/* ----- LOGO Y ENCABEZADO ----- */
 .logo-container {
   text-align: center;
   margin-bottom: 20px;
@@ -755,7 +708,6 @@ h2 {
   margin-bottom: 20px;
 }
 
-/* ----- FORMULARIO DE REGISTRO ----- */
 form {
   max-width: 100%;
   margin: 0 auto;
@@ -764,7 +716,6 @@ form {
   align-items: stretch;
 }
 
-/* Aplica tanto a inputs como selects dentro del formulario con id="registerForm" */
 #registerForm input,
 #registerForm select {
   width: 100%;
@@ -775,7 +726,6 @@ form {
   font-size: 14px;
 }
 
-/* ----- BOTÓN DE ENVÍO ----- */
 button {
   padding: 10px;
   background-color: #000;
@@ -791,14 +741,12 @@ button:hover {
   background-color: #333;
 }
 
-/* ----- MENSAJES DE ERROR ----- */
 .error {
   color: red;
   font-size: 12px;
   margin-top: -5px;
 }
 
-/* ----- ENLACES ----- */
 .registro-container a {
   color: #00bfff;
   text-decoration: none;
@@ -807,7 +755,6 @@ button:hover {
 .registro-container a:hover {
   text-decoration: underline;
 }
-/* ----- FORMULARIO DE REGISTRO ----- */
 
 /* ----- CONTENEDOR PRINCIPAL DE INICIO DE SESIÓN ----- */
 .inicio-container {
@@ -821,70 +768,6 @@ button:hover {
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
-/* ----- LOGO Y ENCABEZADO ----- */
-.logo-container {
-  text-align: center;
-  margin-bottom: 20px;
-}
-
-.logo {
-  width: 120px;
-  height: auto;
-}
-
-.company-name {
-  font-size: 24px;
-  font-weight: bold;
-  margin-top: 10px;
-  color: white;
-}
-
-h2 {
-  text-align: center;
-  margin-bottom: 20px;
-}
-
-/* ----- FORMULARIO DE LOGIN ----- */
-form {
-  max-width: 100%;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-}
-
-input {
-  padding: 8px;
-  margin: 8px 0;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  font-size: 14px;
-}
-
-/* ----- BOTÓN ----- */
-button {
-  padding: 10px;
-  background-color: #000;
-  color: #fff;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-weight: bold;
-  transition: background-color 0.2s ease;
-}
-
-button:hover {
-  background-color: #333;
-}
-
-/* ----- MENSAJES DE ERROR ----- */
-.error {
-  color: red;
-  font-size: 12px;
-  margin-top: -5px;
-}
-
-/* ----- ENLACES ----- */
 .inicio-container a {
   color: #00bfff;
   text-decoration: none;
@@ -906,7 +789,6 @@ button:hover {
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
-/* ----- ENCABEZADO CON LOGO ----- */
 .contact-header {
   text-align: center;
   margin-bottom: 20px;
@@ -924,7 +806,6 @@ button:hover {
   color: white;
 }
 
-/* ----- FORMULARIO ----- */
 .contact-form {
   text-align: left;
 }
@@ -947,7 +828,6 @@ button:hover {
   resize: vertical;
 }
 
-/* ----- BOTÓN ENVIAR ----- */
 .btn-enviar {
   margin-top: 15px;
   background-color: #000;
@@ -1011,38 +891,235 @@ button:hover {
   color: white;
 }
 
-/* ==== Tarjetas de video juegos ==== */
-.row {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 20px;
+/* --- ESTILOS PÁGINA DE DETALLE (SLUG) --- */
+.juego-detail-container {
+  background-color: rgba(0, 0, 0, 0.705);
+  max-width: 1200px;
+  margin: 100px auto 50px auto;
+  padding: 40px;
+  border-radius: 10px;
 }
 
-.card {
-  background-color: rgba(0, 0, 0, 0.705) !important;
-  border: none;
-  margin: 1px;
-  color: white;
+.main-image {
+  width: 100%;
+  height: auto;
   border-radius: 8px;
-  overflow: hidden;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border: 3px solid #ddd;
 }
 
-.card:hover {
-  transform: scale(1.03);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.7);
-}
-
-.card .card-body {
+.text-content-juego {
   color: white;
+  display: flex;
+  flex-direction: column;
+  padding-left: 20px;
 }
 
-.card .card-body .text-muted {
-  color: #f0f0f0 !important;
+.text-content-juego h2 {
+  font-family: "Jersey 10", sans-serif;
+  font-size: 3rem;
 }
 
-.card img {
-  border-top: 10px solid #007bff00;
-  border-radius: 8px 8px 0 0;
+.btn-and-price {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin: 20px 0;
+}
+
+.btnAñadir {
+  background-color: #ffffff;
+  color: #000;
+  padding: 10px 25px;
+  border-radius: 5px;
+  border: 2px solid #000;
+  font-weight: bold;
+  transition: 0.3s;
+  font-size: 1.1rem;
+}
+
+.btnAñadir:hover {
+  background-color: #1a1917;
+  color: #fff;
+}
+
+.price {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.image-gallery {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: auto;
+}
+
+.gallery-thumbnail {
+  border-radius: 5px;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: border-color 0.3s;
+}
+
+.gallery-thumbnail:hover {
+  border-color: #fff;
+}
+
+/* Contenedor para "También te puede interesar" */
+.related-games-container {
+  margin-bottom: 50px;
+}
+
+/* --- ESTILOS PARA OCULTAR SCROLLBAR --- */
+.horizontal-scroll-row {
+  /* Oculta la barra de scroll en Firefox */
+  scrollbar-width: none;
+}
+
+.horizontal-scroll-row::-webkit-scrollbar {
+  /* Oculta la barra de scroll en Chrome, Safari y Opera */
+  display: none;
+}
+
+/* --- ESTILOS PÁGINA CARRITO (DE styleCarrito.css) --- */
+h1.cart-title {
+  text-align: center;
+  margin-bottom: 40px;
+  color: white;
+  background-color: rgba(3, 3, 3, 0.493);
+  border-radius: 10px;
+  padding: 10px;
+}
+
+.cart-container {
+  max-width: 1000px;
+  margin: auto;
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.cart-items {
+  flex: 1 1 65%;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.cart-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: rgba(3, 3, 3, 0.493);
+  padding: 15px;
+  border-radius: 10px;
+  color: #fff;
+}
+
+.cart-img {
+  width: 100px;
+  height: 100px;
+  border-radius: 5px;
+  object-fit: cover;
+}
+
+.cart-info {
+  flex: 1;
+  margin-left: 15px;
+}
+
+.cart-info h3 {
+  margin: 0 0 5px;
+  color: #ffffff;
+}
+
+.cart-info a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.cart-price {
+  font-weight: bold;
+  font-size: 1.1em;
+}
+
+.cart-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-minus,
+.btn-plus,
+.btn-remove,
+.btn-aplicar {
+  background-color: #fff !important;
+  border: 2px solid #000 !important;
+  color: #000 !important;
+}
+
+.btn-minus:hover,
+.btn-plus:hover,
+.btn-remove:hover,
+.btn-aplicar:hover {
+  background-color: #000 !important;
+  color: #fff !important;
+}
+
+.btn-pagar {
+  background-color: #000 !important;
+  border: 2px solid #fff !important;
+  color: #fff !important;
+}
+
+.btn-pagar:hover {
+  background-color: #fff !important;
+  color: #000 !important;
+  border: 2px solid #000 !important;
+}
+
+.cart-qty {
+  width: 40px;
+  text-align: center;
+  border: none;
+  background: transparent;
+  color: #fff;
+  font-weight: bold;
+}
+
+.cart-summary {
+  flex: 1 1 30%;
+  background: rgba(3, 3, 3, 0.493);
+  padding: 20px;
+  border-radius: 10px;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  align-items: flex-start;
+}
+
+.cart-summary h3 {
+  width: 100%;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.cart-summary input {
+  width: 100%;
+  padding: 8px;
+  border-radius: 5px;
+  border: 2px solid #000;
+  text-align: center;
+}
+
+@media (max-width: 768px) {
+  .cart-container {
+    flex-direction: column;
+  }
+  .cart-summary {
+    width: 100%;
+    margin-top: 20px;
+    align-items: center;
+  }
 }

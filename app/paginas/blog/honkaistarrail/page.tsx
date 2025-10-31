@@ -3,16 +3,16 @@ import BlogCarousel from "@/components/BlogCarousel";
 
 // Primer Carrusel (Fase 1)
 const phase1Images = [
-  { src: "/hsrbannerhy.jpg", alt: "HSR 3.6 Banner Fase 1 - Hyacine" },
-  { src: "/hsrbannercas.jpg", alt: "HSR 3.6 Banner Fase 1 - Castorice" },
-  { src: "/hsrbannertri.jpg", alt: "HSR 3.6 Banner Fase 1 - Tribbie" },
+  { src: "/hsrbannerhy.jpg", alt: "HSR 3.7 Banner Fase 1 - Hyacine" },
+  { src: "/hsrbannercas.jpg", alt: "HSR 3.7 Banner Fase 1 - Castorice" },
+  { src: "/hsrbannertri.jpg", alt: "HSR 3.7 Banner Fase 1 - Tribbie" },
 ];
 
 // Segundo Carrusel (Fase 2)
 const phase2Images = [
-  { src: "/hsrbannerpha.jpg", alt: "HSR 3.6 Banner Fase 2 - Phainon" },
-  { src: "/hsrbannercip.jpg", alt: "HSR 3.6 Banner Fase 2 - Cipher" },
-  { src: "/hsrbannermy.jpg", alt: "HSR 3.6 Banner Fase 2 - Mydei" },
+  { src: "/hsrbannerpha.jpg", alt: "HSR 3.7 Banner Fase 2 - Phainon" },
+  { src: "/hsrbannercip.jpg", alt: "HSR 3.7 Banner Fase 2 - Cipher" },
+  { src: "/hsrbannermy.jpg", alt: "HSR 3.7 Banner Fase 2 - Mydei" },
 ];
 
 const Page: React.FC = () => {
@@ -33,7 +33,7 @@ const Page: React.FC = () => {
           />
 
           <p>
-            <strong>Honkai: Star Rail</strong> es el nuevo título de HoYoverse,
+            <strong>Honkai: Star Rail</strong> es uno de los título de HoYoverse,
             creadores de
             <em>Genshin Impact</em> y <em>Honkai Impact 3rd</em>. Este RPG por
             turnos nos lleva a un viaje intergaláctico lleno de mundos únicos,

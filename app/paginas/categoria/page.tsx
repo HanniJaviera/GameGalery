@@ -15,7 +15,6 @@ export default function Page() {
 
   return (
     <div>
-      {/* Imagen superior de categoría */}
       <div
         className="categoria-banner"
         style={{ backgroundImage: `url(${imagenCategoria})` }}
@@ -23,7 +22,6 @@ export default function Page() {
         <h2>{categoriaSeleccionada}</h2>
       </div>
 
-      {/* Botones de categorías */}
       <div className="categorias">
         {categorias.map((cat) => (
           <button
