@@ -22,7 +22,7 @@ export default function RegistroPage() {
 
       <p style={{ textAlign: "center", marginTop: "15px" }}>
         ¿Ya tienes cuenta?{" "}
-        <a href="paginas/iniciarsesion">Inicia sesión aquí</a>
+        <a href="/paginas/iniciarsesion">Inicia sesión aquí</a>
       </p>
     </div>
   );

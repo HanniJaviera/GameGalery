@@ -20,7 +20,7 @@ export default function LoginPage() {
       <LoginForm />
 
       <p style={{ textAlign: "center", marginTop: "15px" }}>
-        ¿No tienes cuenta? <a href="paginas/registrase">Regístrate aquí</a>
+        ¿No tienes cuenta? <a href="/paginas/registrase">Regístrate aquí</a>
       </p>
     </div>
   );
