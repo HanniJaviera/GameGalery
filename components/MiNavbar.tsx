@@ -73,7 +73,7 @@ export default function MiNavbar() {
           </Link>
 
           {/* Botón de Registro  */}
-          <Link href="/paginas/registrarse" legacyBehavior passHref>
+          <Link href="/paginas/registrase" legacyBehavior passHref>
             <Button className="btn-3 ms-2">Registrar Usuario</Button>
           </Link>
 
