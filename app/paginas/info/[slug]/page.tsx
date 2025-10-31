@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Container, Row, Col, Button } from "react-bootstrap";
-import { notFound, useRouter, useParams } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import { juegosData, Juego } from "../../../juegos";
 import GameCard from "../../../../components/GameCard";
 
@@ -15,6 +15,7 @@ export default function JuegoDetallePage() {
   const juego: Juego | undefined = juegosData.find(
     (j) => j.infoPage === `/paginas/info/${slug}`
   );
+
   const [mainImage, setMainImage] = useState(juego?.imageSrc);
 
   useEffect(() => {
@@ -49,7 +50,7 @@ export default function JuegoDetallePage() {
     localStorage.setItem("carrito", JSON.stringify(carritoActual));
 
     // 6. Opcional: Actualizamos el contador del Navbar
-    window.dispatchEvent(new Event("storage")); // Avisa a otros componentes (como el navbar)
+    window.dispatchEvent(new Event("storage"));
 
     // 7. Redirigimos al carrito
     router.push("/paginas/carrito");
