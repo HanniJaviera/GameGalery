@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Container, Button, Form } from "react-bootstrap";
+import { Button, Form } from "react-bootstrap";
 import { Juego } from "../../juegos";
 
 // Definimos un tipo para el item del carrito, que es un Juego + cantidad

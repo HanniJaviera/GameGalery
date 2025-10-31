@@ -1,10 +1,5 @@
 import React from "react";
 
-//CSS
-// Componentes
-import MiNavbar from "../../../components/MiNavbar";
-import MiFooter from "../../../components/MiFooter";
-
 // Usamos el nombre del componente 'BlogsPage' o 'Page' (depende de tu convención, usaremos Page)
 const Page: React.FC = () => {
   return (
