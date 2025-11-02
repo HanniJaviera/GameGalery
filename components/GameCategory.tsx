@@ -11,7 +11,6 @@ interface GameCategoryProps {
 export default function GameCategory({ categorias }: GameCategoryProps) {
   const [categoriaSeleccionada, setCategoriaSeleccionada] = useState(1);
 
-  // Aquí agrupamos tus juegos de ejemplo en categorías ficticias
   const juegos: { [key: number]: Juego[] } = {
     1: juegosData.slice(0, 3), // Acción
     2: juegosData.slice(3, 6), // Aventura

@@ -6,7 +6,6 @@ import Link from "next/link";
 import { Button, Form } from "react-bootstrap";
 import { Juego } from "../../juegos";
 
-// Definimos un tipo para el item del carrito, que es un Juego + cantidad
 interface CartItem extends Juego {
   cantidad: number;
 }
@@ -15,8 +14,6 @@ export default function CarritoPage() {
   const [carrito, setCarrito] = useState<CartItem[]>([]);
   const [total, setTotal] = useState(0);
 
-  // --- Cargar Carrito desde LocalStorage ---
-  // Este useEffect se ejecuta solo una vez, cuando el componente se monta
   useEffect(() => {
     cargarCarrito();
   }, []);
@@ -37,20 +34,16 @@ export default function CarritoPage() {
   };
 
   // --- Guardar y Actualizar ---
-  // Esta función actualiza el estado, el total, y el localStorage
   const guardarCarrito = (items: CartItem[]) => {
     localStorage.setItem("carrito", JSON.stringify(items));
     setCarrito(items);
     calcularTotal(items);
-    // Dispara un evento para que el Navbar actualice su contador
     window.dispatchEvent(new Event("storage"));
   };
 
-  // --- Funciones del Carrito ---
-
   const handleUpdateCantidad = (id: number, nuevaCantidad: number) => {
     if (nuevaCantidad < 1) {
-      handleRemoveItem(id); // Elimina si la cantidad es 0 o menos
+      handleRemoveItem(id);
       return;
     }
     const nuevoCarrito = carrito.map((item) =>
@@ -64,13 +57,11 @@ export default function CarritoPage() {
     guardarCarrito(nuevoCarrito);
   };
 
-  // --- Renderizado ---
   return (
     <main className="container" style={{ paddingTop: "100px" }}>
       <h1 className="cart-title">Mi carrito de compras</h1>
 
       <div className="cart-container">
-        {/* --- Columna de Items --- */}
         <div className="cart-items">
           {carrito.length === 0 ? (
             <p style={{ color: "white" }}>Tu carrito está vacío.</p>
@@ -127,7 +118,6 @@ export default function CarritoPage() {
           )}
         </div>
 
-        {/* --- Columna de Resumen --- */}
         <div className="cart-summary">
           <h3>TOTAL: ${total.toFixed(2)}</h3>
           <Form.Control

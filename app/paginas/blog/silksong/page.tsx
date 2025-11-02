@@ -1,6 +1,5 @@
 import React from "react";
 
-// Renombramos la constante de 'BlogSilksong' a 'Page' por convención del App Router de Next.js
 const Page: React.FC = () => {
   return (
     <div className="blog-silksong-page">
@@ -70,7 +69,6 @@ const Page: React.FC = () => {
           />
         </section>
 
-        {/* ===== COMENTARIOS ===== */}
         <section className="comentarios">
           <h3>Comentarios</h3>
 

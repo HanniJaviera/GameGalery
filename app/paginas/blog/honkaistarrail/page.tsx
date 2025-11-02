@@ -33,8 +33,8 @@ const Page: React.FC = () => {
           />
 
           <p>
-            <strong>Honkai: Star Rail</strong> es uno de los título de HoYoverse,
-            creadores de
+            <strong>Honkai: Star Rail</strong> es uno de los título de
+            HoYoverse, creadores de
             <em>Genshin Impact</em> y <em>Honkai Impact 3rd</em>. Este RPG por
             turnos nos lleva a un viaje intergaláctico lleno de mundos únicos,
             personajes carismáticos y batallas estratégicas.
@@ -137,7 +137,6 @@ const Page: React.FC = () => {
           <BlogCarousel images={phase2Images} />
         </section>
 
-        {/* ===== COMENTARIOS ===== */}
         <section className="comentarios">
           <h3>Comentarios</h3>
 
@@ -175,7 +174,6 @@ const Page: React.FC = () => {
             </button>
           </form>
 
-          {/* Lista de comentarios */}
           <div className="comentario">
             <img
               src="/hsricon.jpg"

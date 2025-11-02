@@ -79,12 +79,7 @@ export const juegosData: Juego[] = [
     categoria: "Shooter",
     description:
       "La siguiente evolución del shooter táctico en primera persona. CS2 introduce nuevos mapas, físicas realistas y un motor gráfico actualizado.",
-    gallery: [
-      "/cs1.jpg",
-      "/cs2.jpg", // La ruta aquí tenía un error, la corregí
-      "/cs3.jpg",
-      "/cs4.jpg",
-    ],
+    gallery: ["/cs1.jpg", "/cs2.jpg", "/cs3.jpg", "/cs4.jpg"],
   },
   // --- Juego 7: NBA 2K26 ---
   {

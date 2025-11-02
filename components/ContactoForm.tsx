@@ -20,7 +20,6 @@ export default function ContactoForm() {
       return;
     }
 
-    // Aquí podrías enviar el mensaje a una API o backend real
     console.log("📩 Mensaje enviado:", { nombre, email, mensaje });
 
     setStatus("✅ ¡Mensaje enviado con éxito!");
