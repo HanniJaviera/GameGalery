@@ -96,7 +96,7 @@ export const juegosData: Juego[] = [
     categoria: "Deportes",
     description:
       "Vive el sueño de la NBA con gráficos hiperrealistas, físicas mejoradas y todos tus equipos y jugadores favoritos actualizados.",
-    gallery: ["/nba1.jpg", "/nba2.jpg", "/nba3.jpg", "/nba4.jpg"],
+    gallery: ["/NBA1.jpg", "/NBA2.jpg", "/NBA3.jpg", "/NBA4.jpg"],
   },
   // --- Juego 8: METAL GEAR SOLID Δ ---
   {
@@ -108,7 +108,12 @@ export const juegosData: Juego[] = [
     categoria: "Acción",
     description:
       "Revive la legendaria misión de Naked Snake en este remake de Metal Gear Solid 3. Gráficos de última generación y sigilo táctico en la jungla.",
-    gallery: ["/mg1.jpg", "/mg2.jpg", "/mg3.jpg", "/mg4.jpg"],
+    gallery: [
+      "/metalgear1.jpg",
+      "/metalgear2.jpg",
+      "/metalgear3.jpg",
+      "/metalgear4.jpg",
+    ],
   },
   // --- Juego 9: Borderlands 4 ---
   {

@@ -29,12 +29,15 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`
+          ${geistSans.variable} 
+          ${geistMono.variable} 
+          // ⚠️ AÑADE ESTAS CLASES: min-h-screen flex flex-col
+          min-h-screen flex flex-col
+        `}
       >
-        {/* 2. USA EL NAVBAR AQUÍ */}
         <MiNavbar />
-
-        <main>{children}</main>
+        <main className="flex-grow w-full">{children}</main>
         <MiFooter />
       </body>
     </html>
