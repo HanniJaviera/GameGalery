@@ -2,10 +2,14 @@
 import { useState, useEffect } from "react";
 import { Navbar, Nav, Container, Button } from "react-bootstrap";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function MiNavbar() {
   const [cartCount, setCartCount] = useState(0);
+  const [usuario, setUsuario] = useState<any>(null);
+  const router = useRouter();
 
+  // --- Contador del carrito ---
   const updateCartCount = () => {
     if (typeof window !== "undefined") {
       const carrito = JSON.parse(localStorage.getItem("carrito") || "[]");
@@ -17,19 +21,45 @@ export default function MiNavbar() {
     }
   };
 
+  // --- Detectar usuario logueado ---
+  const checkUser = () => {
+    if (typeof window !== "undefined") {
+      const user = localStorage.getItem("usuario");
+      if (user) {
+        setUsuario(JSON.parse(user));
+      } else {
+        setUsuario(null);
+      }
+    }
+  };
+
   useEffect(() => {
     updateCartCount();
+    checkUser();
 
     const handleStorageChange = () => {
       updateCartCount();
+      checkUser();
     };
 
     window.addEventListener("storage", handleStorageChange);
-
     return () => {
       window.removeEventListener("storage", handleStorageChange);
     };
   }, []);
+
+  // --- Manejar login / logout ---
+  const handleAuth = () => {
+    if (usuario) {
+      // Cerrar sesión
+      localStorage.removeItem("usuario");
+      setUsuario(null);
+      router.push("/"); // redirige al inicio
+    } else {
+      // Ir a iniciar sesión
+      router.push("/paginas/iniciarsesion");
+    }
+  };
 
   return (
     <Navbar expand="lg" fixed="top" className="navbar-white navbar-transparent">
@@ -38,12 +68,9 @@ export default function MiNavbar() {
           GAME GALERY
         </Navbar.Brand>
 
-        {/* Botón Hamburguesa: react-bootstrap lo maneja solo */}
         <Navbar.Toggle aria-controls="navbarNav" />
 
-        {/* Contenedor Colapsable */}
         <Navbar.Collapse id="navbarNav">
-          {/* Links de Navegación: Usamos Nav.Link con "as={Link}" */}
           <Nav className="me-auto">
             <Nav.Link as={Link} href="/">
               INICIO
@@ -67,17 +94,19 @@ export default function MiNavbar() {
         </Navbar.Collapse>
 
         <div className="botones-container d-flex align-items-center">
-          {/* Botón de Iniciar Sesión */}
-          <Link href="/paginas/iniciarsesion" legacyBehavior passHref>
-            <Button className="btn-2 ">Iniciar Sesion</Button>
-          </Link>
+          {/* 🔁 Botón dinámico: Iniciar/Cerrar sesión */}
+          <Button className="btn-2" onClick={handleAuth}>
+            {usuario ? "Cerrar Sesión" : "Iniciar Sesión"}
+          </Button>
 
-          {/* Botón de Registro  */}
-          <Link href="/paginas/registrase" legacyBehavior passHref>
-            <Button className="btn-3 ms-2">Registrar Usuario</Button>
-          </Link>
+          {/* Solo mostrar registro si no hay sesión */}
+          {!usuario && (
+            <Link href="/paginas/registrase" legacyBehavior passHref>
+              <Button className="btn-3 ms-2">Registrar Usuario</Button>
+            </Link>
+          )}
 
-          {/* Icono de Carrito */}
+          {/* Icono del carrito */}
           <Link href="/paginas/carrito" className="cart-icon ms-3">
             🛒 Cart (<span id="cart-count">{cartCount}</span>)
           </Link>

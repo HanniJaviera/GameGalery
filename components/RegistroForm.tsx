@@ -94,7 +94,7 @@ export default function RegistroForm() {
     alert(
       `✅ ¡Registro exitoso!\nNombre: ${newUser.nombre}\nCorreo: ${newUser.correo}`
     );
-    window.location.href = "/login";
+    window.location.href = "/paginas/iniciarsesion";
   };
 
   return (

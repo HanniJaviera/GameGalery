@@ -24,13 +24,17 @@ export default function LoginForm() {
     const storedUsers: User[] = JSON.parse(
       localStorage.getItem("registeredUsers") || "[]"
     );
+
     const userFound = storedUsers.find(
       (user) => user.correo === correo && user.password === password
     );
 
     if (userFound) {
+      // ✅ Guardar sesión
+      localStorage.setItem("usuario", JSON.stringify(userFound));
+
       alert(`✅ ¡Bienvenido, ${userFound.nombre}!`);
-      window.location.href = "/";
+      window.location.href = "/"; // Redirige al inicio
     } else {
       setError("❌ Correo o contraseña incorrectos.");
     }
