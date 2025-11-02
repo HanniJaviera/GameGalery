@@ -4,9 +4,15 @@ import { Navbar, Nav, Container, Button } from "react-bootstrap";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
+interface User {
+  nombre: string;
+  email: string;
+  contraseña: string;
+}
+
 export default function MiNavbar() {
   const [cartCount, setCartCount] = useState(0);
-  const [usuario, setUsuario] = useState<any>(null);
+  const [usuario, setUsuario] = useState<User | null>(null);
   const router = useRouter();
 
   // --- Contador del carrito ---
