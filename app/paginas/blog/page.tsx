@@ -1,6 +1,5 @@
 import React from "react";
 
-// Usamos el nombre del componente 'BlogsPage' o 'Page' (depende de tu convención, usaremos Page)
 const Page: React.FC = () => {
   return (
     <div id="pagina-nosotros">
@@ -17,7 +16,6 @@ const Page: React.FC = () => {
               servidores de Europa y Asia. Consulta los banners, personajes,
               noticias de marketing y otras novedades sobre la versión 3.7.
             </p>
-            {/* Consejo: Reemplazar con <Link to="/blogs/honkai"> */}
             <a href="/paginas/blog/honkaistarrail">
               <button className="btn-ver-nt1">VER MÁS</button>
             </a>
@@ -36,7 +34,6 @@ const Page: React.FC = () => {
               septiembre de 2025. Su lanzamiento fue simultáneo a nivel mundial
               en todas las plataformas.
             </p>
-            {/* Consejo: Reemplazar con <Link to="/blogs/silksong"> */}
             <a href="/paginas/blog/silksong">
               <button className="btn-ver-nt2">VER MÁS</button>
             </a>

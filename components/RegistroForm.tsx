@@ -68,7 +68,6 @@ export default function RegistroForm() {
     setErrors(newErrors);
     if (!valid) return;
 
-    // ✅ Guardar usuario en localStorage
     const newUser: User = {
       nombre: formData.nombre,
       correo: formData.correo,

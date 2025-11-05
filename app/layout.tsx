@@ -32,8 +32,6 @@ export default function RootLayout({
         className={`
           ${geistSans.variable} 
           ${geistMono.variable} 
-          // ⚠️ AÑADE ESTAS CLASES: min-h-screen flex flex-col
-          min-h-screen flex flex-col
         `}
       >
         <MiNavbar />
