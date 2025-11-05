@@ -7,7 +7,7 @@ import { juegosData } from "../app/juegos";
 
 function Banner() {
   return (
-    <Link href="/info/borderlands" className="header-link">
+    <Link href="paginas/info/borderlands" className="header-link">
       {" "}
       <header className="header">
         <video autoPlay muted loop className="video-background">

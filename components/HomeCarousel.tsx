@@ -28,7 +28,7 @@ export default function HomeCarousel() {
             slide={false}
           >
             <Carousel.Item>
-              <Link href="/infohollowknight">
+              <Link href="/paginas/info/hollowknight">
                 <Image
                   src="/hollowknight.jpg"
                   width={900}
@@ -41,7 +41,7 @@ export default function HomeCarousel() {
             </Carousel.Item>
 
             <Carousel.Item>
-              <Link href="/">
+              <Link href="/paginas/info/hellisus">
                 <Image
                   src="/hellisus.jpg"
                   width={900}
@@ -52,7 +52,7 @@ export default function HomeCarousel() {
               </Link>
             </Carousel.Item>
             <Carousel.Item>
-              <Link href="/infodungeons">
+              <Link href="/paginas/info/dungeons">
                 <Image
                   src="/dungeions.jpg"
                   width={900}
