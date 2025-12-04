@@ -12,8 +12,7 @@ export default function CatalogoPage() {
   useEffect(() => {
     const fetchProductos = async () => {
       try {
-
-        const url = `${process.env.NEXT_PUBLIC_API_PRODUCTS}/api/productos`;
+        const url = `${process.env.NEXT_PUBLIC_API_PRODUCTS}/api/product`;
 
         const response = await fetch(url);
 
