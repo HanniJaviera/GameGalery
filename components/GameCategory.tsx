@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import GameCard from "@/components/GameCard";
-import { Juego } from "@/app/juegos";
+import { Juego } from "@/app/juegos"; // Importamos la interfaz
 import { Spinner, Alert } from "react-bootstrap";
 
 export default function GameCategory() {
@@ -24,7 +24,8 @@ export default function GameCategory() {
         setTodosLosJuegos(data);
 
         if (data.length > 0) {
-          const primera = data.some((j: any) => j.categoria === "Acción")
+          // AQUÍ ESTABA EL ERROR: Cambiamos 'any' por 'Juego'
+          const primera = data.some((j: Juego) => j.categoria === "Acción")
             ? "Acción"
             : data[0].categoria || "General";
           setCategoriaSeleccionada(primera);
@@ -39,6 +40,8 @@ export default function GameCategory() {
 
     fetchJuegos();
   }, []);
+
+  // ... (El resto del código sigue igual)
 
   const listaCategorias = Array.from(
     new Set(todosLosJuegos.map((j) => j.categoria || "Otros"))
