@@ -10,20 +10,25 @@ interface GameCardProps {
 
 const GameCard: React.FC<GameCardProps> = ({ juego }) => {
   return (
-    <Card className="h-100">
+    <Card className="h-100 shadow-sm">
       <Card.Img
         variant="top"
-        src={juego.imageSrc}
-        alt={juego.title}
+        // PROTECCIÓN 1: Si no hay imagen, no se rompe
+        src={juego.imageSrc || "/placeholder.jpg"}
+        alt={juego.title || "Imagen del juego"}
         style={{ height: "180px", objectFit: "cover" }}
       />
       <Card.Body className="d-flex flex-column">
-        <Card.Title as="h5">{juego.title}</Card.Title>
+        {/* PROTECCIÓN 2: Título por defecto */}
+        <Card.Title as="h5">{juego.title || "Sin Título"}</Card.Title>
+
         <Card.Text as="h6" className="text-muted">
-          USD {juego.price.toFixed(2)}
+          {/* PROTECCIÓN 3 (CRÍTICA): Evita el crash si el precio es null */}
+          USD {juego.price != null ? juego.price.toFixed(2) : "0.00"}
         </Card.Text>
 
-        <Link href={juego.infoPage} passHref legacyBehavior>
+        {/* PROTECCIÓN 4: Evita enlace roto */}
+        <Link href={juego.infoPage || "#"} passHref legacyBehavior>
           <Button variant="primary" className="mt-auto">
             Ver más
           </Button>
