@@ -6,12 +6,14 @@ import { Juego } from "@/app/juegos"; // Importamos la interfaz
 import { Spinner, Alert } from "react-bootstrap";
 
 export default function GameCategory() {
+  // 1. Estados para datos, carga y selección
   const [todosLosJuegos, setTodosLosJuegos] = useState<Juego[]>([]);
   const [categoriaSeleccionada, setCategoriaSeleccionada] =
     useState<string>("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // 2. Fetch de datos al montar el componente
   useEffect(() => {
     const fetchJuegos = async () => {
       try {
@@ -23,8 +25,8 @@ export default function GameCategory() {
         const data = await response.json();
         setTodosLosJuegos(data);
 
+        // Seleccionamos la primera categoría disponible por defecto
         if (data.length > 0) {
-          // AQUÍ ESTABA EL ERROR: Cambiamos 'any' por 'Juego'
           const primera = data.some((j: Juego) => j.categoria === "Acción")
             ? "Acción"
             : data[0].categoria || "General";
@@ -41,20 +43,22 @@ export default function GameCategory() {
     fetchJuegos();
   }, []);
 
-  // ... (El resto del código sigue igual)
-
+  // 3. Extraer categorías únicas dinámicamente
   const listaCategorias = Array.from(
     new Set(todosLosJuegos.map((j) => j.categoria || "Otros"))
   );
 
+  // 4. Filtrar los juegos según la selección
   const juegosAmostrar = todosLosJuegos.filter(
     (j) => (j.categoria || "Otros") === categoriaSeleccionada
   );
 
+  // --- RENDERIZADO ---
+
   if (loading)
     return (
       <div className="text-center py-5">
-        <Spinner animation="border" />
+        <Spinner animation="border" variant="light" />
       </div>
     );
   if (error)
@@ -66,54 +70,31 @@ export default function GameCategory() {
 
   return (
     <div className="container py-4">
-      <div className="d-flex justify-content-center gap-3 mb-5 flex-wrap">
-        {listaCategorias.map((catNombre) => {
-          const juegoEjemplo = todosLosJuegos.find(
-            (j) => (j.categoria || "Otros") === catNombre
-          );
-          const imagenMiniatura = juegoEjemplo?.imageSrc || "/placeholder.jpg";
-
-          return (
-            <div
-              key={catNombre}
-              className={`text-center border rounded p-2 shadow-sm cursor-pointer ${
-                categoriaSeleccionada === catNombre
-                  ? "border-primary bg-light"
-                  : "border-light"
-              }`}
-              style={{
-                width: "120px",
-                cursor: "pointer",
-                transition: "all 0.2s",
-              }}
-              onClick={() => setCategoriaSeleccionada(catNombre)}
-            >
-              <div
-                className="d-flex align-items-center justify-content-center mx-auto mb-2 rounded"
-                style={{
-                  width: "80px",
-                  height: "80px",
-                  backgroundImage: `url(${imagenMiniatura})`,
-                  backgroundSize: "cover",
-                  backgroundPosition: "center",
-                  backgroundColor: "#eee",
-                }}
-              />
-              <p
-                className="mb-0 fw-semibold text-capitalize"
-                style={{ fontSize: "0.9rem" }}
-              >
-                {catNombre}
-              </p>
-            </div>
-          );
-        })}
+      {/* === SECCIÓN DE CATEGORÍAS (BOTONES SIMPLES) === */}
+      {/* Volvemos al diseño original de botones claros */}
+      <div className="d-flex justify-content-center gap-2 mb-5 flex-wrap">
+        {listaCategorias.map((catNombre) => (
+          <button
+            key={catNombre}
+            // Usamos clases de Bootstrap para botones sólidos o de contorno
+            className={`btn px-4 py-2 fw-bold ${
+              categoriaSeleccionada === catNombre
+                ? "btn-primary" // Botón azul sólido si está activo
+                : "btn-outline-light" // Botón con borde claro si no está activo (para fondo oscuro)
+            }`}
+            onClick={() => setCategoriaSeleccionada(catNombre)}
+          >
+            {catNombre}
+          </button>
+        ))}
       </div>
 
-      <h3 className="mb-4 text-primary border-bottom pb-2 d-inline-block">
+      {/* TÍTULO DE LA SECCIÓN SELECCIONADA */}
+      <h3 className="mb-4 text-white border-bottom border-light pb-2 d-inline-block">
         {categoriaSeleccionada}
       </h3>
 
+      {/* GRILLA DE JUEGOS */}
       <div className="row g-4">
         {juegosAmostrar.length > 0 ? (
           juegosAmostrar.map((juego) => (
@@ -122,7 +103,7 @@ export default function GameCategory() {
             </div>
           ))
         ) : (
-          <p className="text-muted">No hay juegos en esta categoría.</p>
+          <p className="text-white-50">No hay juegos en esta categoría.</p>
         )}
       </div>
     </div>
