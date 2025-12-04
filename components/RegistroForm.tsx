@@ -1,13 +1,13 @@
 "use client";
-import { useState } from "react";
 
-interface User {
-  nombre: string;
-  correo: string;
-  password: string;
-}
+import { useState } from "react";
+import { useRouter } from "next/navigation"; // Hook para redireccionar
 
 export default function RegistroForm() {
+  const router = useRouter();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Estados para los campos del formulario
   const [formData, setFormData] = useState({
     nombre: "",
     correo: "",
@@ -19,13 +19,16 @@ export default function RegistroForm() {
     comuna: "",
   });
 
+  // Estados para los errores de validación
   const [errors, setErrors] = useState<{
     correo?: string;
     confirmCorreo?: string;
     password?: string;
     confirmPassword?: string;
+    general?: string;
   }>({});
 
+  // Manejador de cambios en los inputs
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
@@ -35,12 +38,17 @@ export default function RegistroForm() {
     });
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  // Manejador del envío del formulario
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setErrors({});
+    setIsSubmitting(true);
 
+    // --- 1. VALIDACIONES DEL FRONTEND ---
     let valid = true;
     const newErrors: typeof errors = {};
+
+    // Validación de correo institucional o gmail
     const correoRegex =
       /^[a-zA-Z0-9._%+-]+@(duoc\.cl|profesor\.duoc\.cl|gmail\.com)$/;
 
@@ -65,39 +73,74 @@ export default function RegistroForm() {
       valid = false;
     }
 
-    setErrors(newErrors);
-    if (!valid) return;
 
-    const newUser: User = {
-      nombre: formData.nombre,
-      correo: formData.correo,
-      password: formData.password,
-    };
-
-    const storedUsers: User[] = JSON.parse(
-      localStorage.getItem("registeredUsers") || "[]"
-    );
-
-    const userExists = storedUsers.some(
-      (user) => user.correo === newUser.correo
-    );
-
-    if (userExists) {
-      alert("❌ Este correo ya está registrado.");
+    if (!valid) {
+      setErrors(newErrors);
+      setIsSubmitting(false);
       return;
     }
 
-    storedUsers.push(newUser);
-    localStorage.setItem("registeredUsers", JSON.stringify(storedUsers));
+    // --- 2. PREPARAR DATOS PARA EL BACKEND (Mapeo) ---
+    // Ajustamos los nombres para que coincidan con la Entidad Java
+    const usuarioParaBackend = {
+      nombreUsuario: formData.nombre,
+      correo: formData.correo,
+      celular: formData.telefono,
+      // Unimos Comuna y Región en un solo string para 'direccion'
+      direccion: `${formData.comuna}, ${formData.region}`,
+      // Enviamos la contraseña (Asegúrate de haber actualizado tu Java Entity)
+      password: formData.password,
+    };
 
-    alert(
-      `✅ ¡Registro exitoso!\nNombre: ${newUser.nombre}\nCorreo: ${newUser.correo}`
-    );
-    window.location.href = "/paginas/iniciarsesion";
+    try {
+      // --- 3. ENVIAR A RAILWAY ---
+      // Usamos la variable de entorno definida en Vercel
+      const url = `${process.env.NEXT_PUBLIC_API_USERS}/usuarios`;
+
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(usuarioParaBackend),
+      });
+
+      if (response.ok) {
+        // ÉXITO
+        alert("✅ ¡Usuario registrado exitosamente!");
+        // Redirigir al login
+        router.push("/paginas/iniciarsesion");
+      } else {
+        // ERROR DEL SERVIDOR
+        const errorText = await response.text();
+        console.error("Error del backend:", errorText);
+        setErrors({
+          general: "Hubo un error al guardar el usuario. Inténtalo de nuevo.",
+        });
+      }
+    } catch (error) {
+      console.error("Error de conexión:", error);
+      setErrors({
+        general: "No se pudo conectar con el servidor. Revisa tu conexión.",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
+  // --- RENDERIZADO DEL FORMULARIO ---
   return (
     <form id="registerForm" onSubmit={handleSubmit}>
+      {/* Mensaje de error general (si falla la API) */}
+      {errors.general && (
+        <div
+          className="alert alert-danger text-center p-2 mb-3"
+          style={{ color: "red", fontWeight: "bold" }}
+        >
+          {errors.general}
+        </div>
+      )}
+
       <label htmlFor="nombre">Nombre completo</label>
       <input
         type="text"
@@ -118,9 +161,13 @@ export default function RegistroForm() {
         onChange={handleChange}
         required
         maxLength={100}
-        pattern="^[a-zA-Z0-9._%+-]+@(duoc\\.cl|profesor\\.duoc\\.cl|gmail\\.com)$"
+        pattern="^[a-zA-Z0-9._%+-]+@(duoc\.cl|profesor\.duoc\.cl|gmail\.com)$"
       />
-      {errors.correo && <div className="error">{errors.correo}</div>}
+      {errors.correo && (
+        <div className="error" style={{ color: "red" }}>
+          {errors.correo}
+        </div>
+      )}
 
       <label htmlFor="confirmCorreo">Confirmar correo</label>
       <input
@@ -133,7 +180,9 @@ export default function RegistroForm() {
         maxLength={100}
       />
       {errors.confirmCorreo && (
-        <div className="error">{errors.confirmCorreo}</div>
+        <div className="error" style={{ color: "red" }}>
+          {errors.confirmCorreo}
+        </div>
       )}
 
       <label htmlFor="password">Contraseña</label>
@@ -147,7 +196,11 @@ export default function RegistroForm() {
         minLength={4}
         maxLength={10}
       />
-      {errors.password && <div className="error">{errors.password}</div>}
+      {errors.password && (
+        <div className="error" style={{ color: "red" }}>
+          {errors.password}
+        </div>
+      )}
 
       <label htmlFor="confirmPassword">Confirmar contraseña</label>
       <input
@@ -161,7 +214,9 @@ export default function RegistroForm() {
         maxLength={10}
       />
       {errors.confirmPassword && (
-        <div className="error">{errors.confirmPassword}</div>
+        <div className="error" style={{ color: "red" }}>
+          {errors.confirmPassword}
+        </div>
       )}
 
       <label htmlFor="telefono">Teléfono (opcional)</label>
@@ -213,8 +268,12 @@ export default function RegistroForm() {
         <option value="Talca">Talca</option>
       </select>
 
-      <button type="submit" style={{ marginTop: "1rem" }}>
-        Registrar
+      <button
+        type="submit"
+        style={{ marginTop: "1rem" }}
+        disabled={isSubmitting} // Deshabilita el botón mientras carga
+      >
+        {isSubmitting ? "Registrando..." : "Registrar"}
       </button>
     </form>
   );
