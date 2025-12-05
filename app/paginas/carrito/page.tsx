@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Button, Form, Modal, Spinner } from "react-bootstrap";
 import { Juego } from "@/app/juegos";
 
@@ -8,7 +8,6 @@ interface CartItem extends Juego {
   cantidad: number;
 }
 
-// Interfaz flexible para evitar errores si las propiedades cambian de nombre
 interface User {
   nombre?: string;
   nombreUsuario?: string;
@@ -33,27 +32,35 @@ export default function CarritoPage() {
     process.env.NEXT_PUBLIC_API_PRODUCTS ||
     "https://ms-products-db-production.up.railway.app";
 
-  // Funciones auxiliares de cálculo (definidas fuera para ser usadas por el efecto y handlers)
-  const calcularTotal = (items: CartItem[]) => {
+  // Usamos useCallback para que estas funciones sean estables y no causen re-renders infinitos
+  const calcularTotal = useCallback((items: CartItem[]) => {
     const nuevoTotal = items.reduce(
       (acc, item) => acc + item.price * item.cantidad,
       0
     );
     setTotal(nuevoTotal);
-  };
+  }, []);
 
-  const cargarCarrito = () => {
+  const guardarCarrito = useCallback(
+    (items: CartItem[]) => {
+      localStorage.setItem("carrito", JSON.stringify(items));
+      setCarrito(items);
+      calcularTotal(items);
+      window.dispatchEvent(new Event("storage"));
+    },
+    [calcularTotal]
+  );
+
+  const cargarCarrito = useCallback(() => {
     const carritoGuardado = JSON.parse(localStorage.getItem("carrito") || "[]");
     setCarrito(carritoGuardado);
     calcularTotal(carritoGuardado);
-  };
+  }, [calcularTotal]);
 
-  useEffect(() => {
-    // Definimos la función aquí dentro para limpiar dependencias del efecto
-    const obtenerDatosUsuarioDesdeBackend = async (
-      correo: string,
-      usuarioLocal: User
-    ) => {
+  // Esta es la función clave que busca en la BBDD
+  const obtenerDatosUsuarioDesdeBackend = useCallback(
+    async (correo: string, usuarioLocal: User) => {
+      console.log("🔍 Buscando datos frescos en BBDD para:", correo);
       try {
         const response = await fetch(
           `${baseUrl}/usuarios/buscar?correo=${correo}`
@@ -61,36 +68,46 @@ export default function CarritoPage() {
 
         if (response.ok) {
           const datosBackend = await response.json();
-          setCurrentUser({
-            ...usuarioLocal,
-            ...datosBackend,
-          });
+          console.log("✅ Datos recibidos del backend:", datosBackend);
+
+          // Actualizamos el usuario mezclando lo local con lo que trajo la base de datos
+          // La BBDD tiene prioridad
+          setCurrentUser((prev) => ({
+            ...prev, // Mantener lo que ya teníamos
+            ...usuarioLocal, // Asegurar base local
+            ...datosBackend, // Sobrescribir con datos frescos (dirección, etc.)
+          }));
+        } else {
+          console.warn("⚠️ No se encontró información extra en el backend.");
         }
       } catch (error) {
-        console.error("Error conectando con el servicio de usuarios:", error);
+        console.error("❌ Error conectando con la base de datos:", error);
       }
-    };
+    },
+    [baseUrl]
+  );
 
+  // Efecto Principal: Carga inicial de carrito y usuario
+  useEffect(() => {
     cargarCarrito();
 
     try {
       const storedUser = localStorage.getItem("usuario");
       if (storedUser) {
         const localUser = JSON.parse(storedUser);
+        // 1. Establecemos inmediatamente lo que hay en caché para que no se vea vacío
         setCurrentUser(localUser);
 
+        // 2. Si hay correo, vamos a la BBDD a buscar la dirección real
         if (localUser.correo) {
           obtenerDatosUsuarioDesdeBackend(localUser.correo, localUser);
         }
       }
     } catch (error) {
-      console.error("Error al cargar datos del usuario:", error);
+      console.error("Error al leer localStorage:", error);
       localStorage.removeItem("usuario");
     }
-    // Deshabilitamos la regla de dependencias porque intencionalmente
-    // queremos que esto corra SOLO una vez al montar el componente.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [cargarCarrito, obtenerDatosUsuarioDesdeBackend]);
 
   const handleCloseCheckout = () => setShowCheckoutModal(false);
   const handleShowCheckout = () => setShowCheckoutModal(true);
@@ -98,13 +115,6 @@ export default function CarritoPage() {
   const redirectToLogin = () => {
     handleCloseCheckout();
     window.location.href = "/paginas/iniciarsesion";
-  };
-
-  const guardarCarrito = (items: CartItem[]) => {
-    localStorage.setItem("carrito", JSON.stringify(items));
-    setCarrito(items);
-    calcularTotal(items);
-    window.dispatchEvent(new Event("storage"));
   };
 
   const handlePurchaseSuccess = async () => {
@@ -119,11 +129,14 @@ export default function CarritoPage() {
       const ventaData = {
         nombreUsuario: nombreFinal,
         correoUsuario: currentUser.correo,
+        // Al enviar esto, estamos usando los datos que (idealmente) vinieron de la BBDD
         direccion: currentUser.direccion || "Sin dirección registrada",
         comuna: currentUser.comuna || "N/A",
         region: currentUser.region || "N/A",
         total: total,
       };
+
+      console.log("Enviando venta al backend:", ventaData);
 
       const response = await fetch(`${baseUrl}/ventas`, {
         method: "POST",
@@ -146,6 +159,8 @@ export default function CarritoPage() {
         guardarCarrito([]);
         handleCloseCheckout();
       } else {
+        const errorMsg = await response.text();
+        console.error("Error respuesta:", errorMsg);
         alert("❌ Error al procesar la compra en el servidor.");
       }
     } catch (error) {
