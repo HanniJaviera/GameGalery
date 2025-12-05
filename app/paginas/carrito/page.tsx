@@ -11,13 +11,13 @@ interface CartItem extends Juego {
 // Interfaz flexible para evitar errores si las propiedades cambian de nombre
 interface User {
   nombre?: string;
-  nombreUsuario?: string; // Agregado por si el backend lo envía así
+  nombreUsuario?: string;
   correo: string;
   region?: string;
   comuna?: string;
   telefono?: string;
   direccion?: string;
-  [key: string]: any; // Permite otras propiedades dinámicas
+  [key: string]: any;
 }
 
 export default function CarritoPage() {
@@ -33,14 +33,50 @@ export default function CarritoPage() {
     process.env.NEXT_PUBLIC_API_PRODUCTS ||
     "https://ms-products-db-production.up.railway.app";
 
+  // Funciones auxiliares de cálculo (definidas fuera para ser usadas por el efecto y handlers)
+  const calcularTotal = (items: CartItem[]) => {
+    const nuevoTotal = items.reduce(
+      (acc, item) => acc + item.price * item.cantidad,
+      0
+    );
+    setTotal(nuevoTotal);
+  };
+
+  const cargarCarrito = () => {
+    const carritoGuardado = JSON.parse(localStorage.getItem("carrito") || "[]");
+    setCarrito(carritoGuardado);
+    calcularTotal(carritoGuardado);
+  };
+
   useEffect(() => {
+    // Definimos la función aquí dentro para limpiar dependencias del efecto
+    const obtenerDatosUsuarioDesdeBackend = async (
+      correo: string,
+      usuarioLocal: User
+    ) => {
+      try {
+        const response = await fetch(
+          `${baseUrl}/usuarios/buscar?correo=${correo}`
+        );
+
+        if (response.ok) {
+          const datosBackend = await response.json();
+          setCurrentUser({
+            ...usuarioLocal,
+            ...datosBackend,
+          });
+        }
+      } catch (error) {
+        console.error("Error conectando con el servicio de usuarios:", error);
+      }
+    };
+
     cargarCarrito();
 
     try {
       const storedUser = localStorage.getItem("usuario");
       if (storedUser) {
         const localUser = JSON.parse(storedUser);
-        console.log("Usuario Local:", localUser); // 🔍 Revisa en consola qué nombre tiene aquí
         setCurrentUser(localUser);
 
         if (localUser.correo) {
@@ -51,34 +87,10 @@ export default function CarritoPage() {
       console.error("Error al cargar datos del usuario:", error);
       localStorage.removeItem("usuario");
     }
+    // Deshabilitamos la regla de dependencias porque intencionalmente
+    // queremos que esto corra SOLO una vez al montar el componente.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const obtenerDatosUsuarioDesdeBackend = async (
-    correo: string,
-    usuarioLocal: User
-  ) => {
-    try {
-      const response = await fetch(
-        `${baseUrl}/usuarios/buscar?correo=${correo}`
-      );
-
-      if (response.ok) {
-        const datosBackend = await response.json();
-        console.log("Datos Backend:", datosBackend); // 🔍 Revisa si aquí viene 'nombre' o 'nombreUsuario'
-
-        setCurrentUser({
-          ...usuarioLocal,
-          ...datosBackend,
-        });
-      } else {
-        console.warn(
-          "No se pudo obtener información adicional del usuario desde el backend."
-        );
-      }
-    } catch (error) {
-      console.error("Error conectando con el servicio de usuarios:", error);
-    }
-  };
 
   const handleCloseCheckout = () => setShowCheckoutModal(false);
   const handleShowCheckout = () => setShowCheckoutModal(true);
@@ -88,13 +100,19 @@ export default function CarritoPage() {
     window.location.href = "/paginas/iniciarsesion";
   };
 
+  const guardarCarrito = (items: CartItem[]) => {
+    localStorage.setItem("carrito", JSON.stringify(items));
+    setCarrito(items);
+    calcularTotal(items);
+    window.dispatchEvent(new Event("storage"));
+  };
+
   const handlePurchaseSuccess = async () => {
     if (!currentUser) return;
 
     setIsProcessing(true);
 
     try {
-      // Intentamos obtener el nombre de cualquiera de las dos propiedades posibles
       const nombreFinal =
         currentUser.nombre || currentUser.nombreUsuario || "Usuario";
 
@@ -106,8 +124,6 @@ export default function CarritoPage() {
         region: currentUser.region || "N/A",
         total: total,
       };
-
-      console.log("Enviando venta al backend:", ventaData);
 
       const response = await fetch(`${baseUrl}/ventas`, {
         method: "POST",
@@ -140,27 +156,6 @@ export default function CarritoPage() {
     }
   };
 
-  const cargarCarrito = () => {
-    const carritoGuardado = JSON.parse(localStorage.getItem("carrito") || "[]");
-    setCarrito(carritoGuardado);
-    calcularTotal(carritoGuardado);
-  };
-
-  const calcularTotal = (items: CartItem[]) => {
-    const nuevoTotal = items.reduce(
-      (acc, item) => acc + item.price * item.cantidad,
-      0
-    );
-    setTotal(nuevoTotal);
-  };
-
-  const guardarCarrito = (items: CartItem[]) => {
-    localStorage.setItem("carrito", JSON.stringify(items));
-    setCarrito(items);
-    calcularTotal(items);
-    window.dispatchEvent(new Event("storage"));
-  };
-
   const handleUpdateCantidad = (id: number, nuevaCantidad: number) => {
     if (nuevaCantidad < 1) {
       handleRemoveItem(id);
@@ -191,6 +186,7 @@ export default function CarritoPage() {
           ) : (
             carrito.map((item) => (
               <div className="cart-item" key={item.id}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={item.imageSrc}
                   alt={item.title}
@@ -282,7 +278,6 @@ export default function CarritoPage() {
               <div className="mb-4 p-3 bg-dark rounded border border-secondary">
                 <h5>Datos del Comprador</h5>
                 <p className="mb-1">
-                  {/* Aquí mostramos nombre O nombreUsuario O un texto por defecto */}
                   <strong>Nombre:</strong>{" "}
                   {currentUser.nombre ||
                     currentUser.nombreUsuario ||
@@ -295,7 +290,6 @@ export default function CarritoPage() {
                   <strong>Dirección:</strong>{" "}
                   {currentUser.direccion || "Cargando..."}
                 </p>
-                {/* SE ELIMINÓ LA SECCIÓN "UBICACIÓN" (COMUNA/REGIÓN) */}
               </div>
 
               <div className="mb-4">
