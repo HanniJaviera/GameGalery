@@ -11,9 +11,11 @@ interface CartItem extends Juego {
 interface User {
   nombre: string;
   correo: string;
+  // Hacemos opcionales estos campos para que no fallen si no existen al principio
   region?: string;
   comuna?: string;
   telefono?: string;
+  direccion?: string;
 }
 
 export default function CarritoPage() {
@@ -21,23 +23,69 @@ export default function CarritoPage() {
   const [total, setTotal] = useState(0);
   const [showCheckoutModal, setShowCheckoutModal] = useState(false);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [isProcessing, setIsProcessing] = useState(false); // Nuevo estado para carga
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const isLoggedIn = !!currentUser;
+
+  // Definimos la URL base aquí para usarla en ambas peticiones (Usuarios y Ventas)
+  const baseUrl =
+    process.env.NEXT_PUBLIC_API_PRODUCTS ||
+    "https://ms-products-db-production.up.railway.app";
 
   useEffect(() => {
     cargarCarrito();
 
+    // 1. Cargar usuario básico del LocalStorage (lo que guardó el Login)
     try {
       const storedUser = localStorage.getItem("usuario");
       if (storedUser) {
-        setCurrentUser(JSON.parse(storedUser));
+        const localUser = JSON.parse(storedUser);
+        setCurrentUser(localUser);
+
+        // 2. CONECTAR AL BACKEND: Buscar datos completos (Dirección, Región, etc.)
+        // Si el usuario tiene correo, vamos a buscar sus detalles a la BBDD
+        if (localUser.correo) {
+          obtenerDatosUsuarioDesdeBackend(localUser.correo, localUser);
+        }
       }
     } catch (error) {
       console.error("Error al cargar datos del usuario:", error);
       localStorage.removeItem("usuario");
     }
   }, []);
+
+  // --- NUEVA FUNCIÓN: Obtener datos reales de la BBDD ---
+  const obtenerDatosUsuarioDesdeBackend = async (
+    correo: string,
+    usuarioLocal: User
+  ) => {
+    try {
+      // AJUSTA ESTA RUTA según tu UsuarioController.
+      // Por ejemplo: /usuarios/buscar?correo=...
+      const response = await fetch(
+        `${baseUrl}/usuarios/buscar?correo=${correo}`
+      );
+
+      if (response.ok) {
+        const datosBackend = await response.json();
+        console.log("Datos frescos del usuario recibidos:", datosBackend);
+
+        // Mezclamos lo local con lo que viene de la base de datos
+        // Los datos del backend (datosBackend) sobrescribirán a los locales si existen
+        setCurrentUser({
+          ...usuarioLocal,
+          ...datosBackend,
+        });
+      } else {
+        console.warn(
+          "No se pudo obtener información adicional del usuario desde el backend."
+        );
+      }
+    } catch (error) {
+      console.error("Error conectando con el servicio de usuarios:", error);
+    }
+  };
+  // -------------------------------------------------------
 
   const handleCloseCheckout = () => setShowCheckoutModal(false);
   const handleShowCheckout = () => setShowCheckoutModal(true);
@@ -47,22 +95,24 @@ export default function CarritoPage() {
     window.location.href = "/paginas/iniciarsesion";
   };
 
-  // --- AQUÍ ESTÁ LA LÓGICA NUEVA PARA GUARDAR EN BBDD ---
   const handlePurchaseSuccess = async () => {
     if (!currentUser) return;
 
-    setIsProcessing(true); // Bloqueamos el botón
+    setIsProcessing(true);
 
     try {
-      const baseUrl =
-        process.env.NEXT_PUBLIC_API_PRODUCTS ||
-        "https://ms-products-db-production.up.railway.app";
-
+      // Construimos el objeto Venta con los datos del estado
       const ventaData = {
         nombreUsuario: currentUser.nombre,
         correoUsuario: currentUser.correo,
-        // El numeroVenta se genera solo en la BBDD
+        // ✅ AQUÍ AGREGAMOS LA DIRECCIÓN PARA QUE SE GUARDE EN LA BASE DE DATOS
+        direccion: currentUser.direccion || "Sin dirección registrada",
+        comuna: currentUser.comuna || "N/A",
+        region: currentUser.region || "N/A",
+        total: total,
       };
+
+      console.log("Enviando venta al backend:", ventaData);
 
       const response = await fetch(`${baseUrl}/ventas`, {
         method: "POST",
@@ -74,11 +124,15 @@ export default function CarritoPage() {
 
       if (response.ok) {
         const ventaGuardada = await response.json();
+
+        // Mostramos confirmación con los datos reales que retornó el backend
         alert(
-          `✅ Compra realizada con éxito. Nº de orden: ${ventaGuardada.numeroVenta}`
+          `✅ Compra realizada con éxito.\n\n` +
+            `Nº de Orden: ${ventaGuardada.id || ventaGuardada.numeroVenta}\n` +
+            `Cliente: ${ventaGuardada.nombreUsuario}\n` +
+            `Enviado a: ${ventaGuardada.direccion || currentUser.direccion}`
         );
 
-        // Limpiamos el carrito solo si se guardó en BBDD
         guardarCarrito([]);
         handleCloseCheckout();
       } else {
@@ -88,10 +142,9 @@ export default function CarritoPage() {
       console.error(error);
       alert("❌ Error de conexión al guardar la venta.");
     } finally {
-      setIsProcessing(false); // Desbloqueamos el botón
+      setIsProcessing(false);
     }
   };
-  // ------------------------------------------------------
 
   const cargarCarrito = () => {
     const carritoGuardado = JSON.parse(localStorage.getItem("carrito") || "[]");
@@ -240,9 +293,14 @@ export default function CarritoPage() {
                 <p className="mb-1">
                   <strong>Correo:</strong> {currentUser.correo}
                 </p>
+                {/* Visualización de datos traídos de la BBDD */}
                 <p className="mb-1">
-                  <strong>Dirección:</strong> {currentUser.comuna || "N/A"},{" "}
-                  {currentUser.region || "N/A"}
+                  <strong>Dirección:</strong>{" "}
+                  {currentUser.direccion || "Cargando..."}
+                </p>
+                <p className="mb-1">
+                  <strong>Ubicación:</strong> {currentUser.comuna || "-"},{" "}
+                  {currentUser.region || "-"}
                 </p>
               </div>
 
