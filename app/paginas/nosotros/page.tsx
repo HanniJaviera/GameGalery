@@ -28,12 +28,16 @@ const NosotrosPage: React.FC = () => {
           <h2>DESARROLLADORAS</h2>
           <div className="dev-container">
             <div className="dev">
-              <img src="/JaviRamirez.jpg" alt="Desarrolladora 1" />
+            <a href="https://github.com/HanniJaviera" target="_blank" rel="noopener noreferrer">
+                <img src="/JaviRamirez.jpg" alt="Desarrolladora 1" />
+            </a>
               <p>Javiera Ramirez</p>
             </div>
 
             <div className="dev">
-              <img src="/GenaAlarcon.jpg" alt="Desarrolladora 2" />
+            <a href="https://github.com/GenAlarcon" target="_blank" rel="noopener noreferrer">
+                <img src="/GenaAlarcon.jpg" alt="Desarrolladora 2" />
+            </a>
               <p>Genara Alarcón</p>
             </div>
           </div>
