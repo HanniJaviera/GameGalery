@@ -73,7 +73,6 @@ export default function RegistroForm() {
       valid = false;
     }
 
-
     if (!valid) {
       setErrors(newErrors);
       setIsSubmitting(false);
@@ -95,7 +94,7 @@ export default function RegistroForm() {
     try {
       // --- 3. ENVIAR A RAILWAY ---
       // Usamos la variable de entorno definida en Vercel
-      const url = `${process.env.NEXT_PUBLIC_API_USERS}/usuarios`;
+      const url = `${process.env.NEXT_PUBLIC_API_PRODUCTS}/usuarios`;
 
       const response = await fetch(url, {
         method: "POST",
