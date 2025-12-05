@@ -16,7 +16,8 @@ interface User {
   comuna?: string;
   telefono?: string;
   direccion?: string;
-  [key: string]: any;
+  // CORRECCIÓN: Cambiamos 'any' por 'unknown' para satisfacer al linter
+  [key: string]: unknown;
 }
 
 export default function CarritoPage() {
@@ -75,11 +76,14 @@ export default function CarritoPage() {
           const datosBackend = await response.json();
           console.log("✅ Datos recibidos del backend:", datosBackend);
 
-          setCurrentUser((prev) => ({
-            ...prev,
-            ...usuarioLocal,
-            ...datosBackend,
-          }));
+          setCurrentUser(
+            (prev) =>
+              ({
+                ...(prev || {}), // Aseguramos que prev no sea null al spreadear
+                ...usuarioLocal,
+                ...datosBackend,
+              } as User)
+          ); // Casting seguro ya que estamos construyendo un User
         } else {
           console.warn("⚠️ No se encontró información extra en el backend.");
         }
@@ -193,7 +197,8 @@ export default function CarritoPage() {
   };
 
   // Helper para renderizar texto de forma segura (evita error de Objetos como hijos)
-  const renderSafe = (value: any, fallback: string) => {
+  // CORRECCIÓN: Cambiamos 'any' por 'unknown'
+  const renderSafe = (value: unknown, fallback: string) => {
     if (typeof value === "string" || typeof value === "number") {
       return value;
     }
