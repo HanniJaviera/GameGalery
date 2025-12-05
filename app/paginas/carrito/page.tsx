@@ -28,11 +28,10 @@ export default function CarritoPage() {
 
   const isLoggedIn = !!currentUser;
 
-  const baseUrl =
-    process.env.NEXT_PUBLIC_API_PRODUCTS ||
-    "https://ms-products-db-production.up.railway.app";
+  // CORRECCIÓN: Evitamos usar process.env directamente ya que puede no estar definido en el navegador
+  const baseUrl = "https://ms-products-db-production.up.railway.app";
 
-  // Usamos useCallback para que estas funciones sean estables y no causen re-renders infinitos
+  // Usamos useCallback para que estas funciones sean estables
   const calcularTotal = useCallback((items: CartItem[]) => {
     const nuevoTotal = items.reduce(
       (acc, item) => acc + item.price * item.cantidad,
@@ -52,12 +51,18 @@ export default function CarritoPage() {
   );
 
   const cargarCarrito = useCallback(() => {
-    const carritoGuardado = JSON.parse(localStorage.getItem("carrito") || "[]");
-    setCarrito(carritoGuardado);
-    calcularTotal(carritoGuardado);
+    try {
+      const carritoGuardado = JSON.parse(
+        localStorage.getItem("carrito") || "[]"
+      );
+      setCarrito(carritoGuardado);
+      calcularTotal(carritoGuardado);
+    } catch (e) {
+      console.error("Error cargando carrito:", e);
+      setCarrito([]);
+    }
   }, [calcularTotal]);
 
-  // Esta es la función clave que busca en la BBDD
   const obtenerDatosUsuarioDesdeBackend = useCallback(
     async (correo: string, usuarioLocal: User) => {
       console.log("🔍 Buscando datos frescos en BBDD para:", correo);
@@ -70,12 +75,10 @@ export default function CarritoPage() {
           const datosBackend = await response.json();
           console.log("✅ Datos recibidos del backend:", datosBackend);
 
-          // Actualizamos el usuario mezclando lo local con lo que trajo la base de datos
-          // La BBDD tiene prioridad
           setCurrentUser((prev) => ({
-            ...prev, // Mantener lo que ya teníamos
-            ...usuarioLocal, // Asegurar base local
-            ...datosBackend, // Sobrescribir con datos frescos (dirección, etc.)
+            ...prev,
+            ...usuarioLocal,
+            ...datosBackend,
           }));
         } else {
           console.warn("⚠️ No se encontró información extra en el backend.");
@@ -87,7 +90,6 @@ export default function CarritoPage() {
     [baseUrl]
   );
 
-  // Efecto Principal: Carga inicial de carrito y usuario
   useEffect(() => {
     cargarCarrito();
 
@@ -95,10 +97,8 @@ export default function CarritoPage() {
       const storedUser = localStorage.getItem("usuario");
       if (storedUser) {
         const localUser = JSON.parse(storedUser);
-        // 1. Establecemos inmediatamente lo que hay en caché para que no se vea vacío
         setCurrentUser(localUser);
 
-        // 2. Si hay correo, vamos a la BBDD a buscar la dirección real
         if (localUser.correo) {
           obtenerDatosUsuarioDesdeBackend(localUser.correo, localUser);
         }
@@ -126,11 +126,16 @@ export default function CarritoPage() {
       const nombreFinal =
         currentUser.nombre || currentUser.nombreUsuario || "Usuario";
 
+      // Aseguramos que la dirección sea un string
+      const direccionFinal =
+        typeof currentUser.direccion === "string"
+          ? currentUser.direccion
+          : "Sin dirección registrada";
+
       const ventaData = {
         nombreUsuario: nombreFinal,
         correoUsuario: currentUser.correo,
-        // Al enviar esto, estamos usando los datos que (idealmente) vinieron de la BBDD
-        direccion: currentUser.direccion || "Sin dirección registrada",
+        direccion: direccionFinal,
         comuna: currentUser.comuna || "N/A",
         region: currentUser.region || "N/A",
         total: total,
@@ -185,6 +190,14 @@ export default function CarritoPage() {
   const handleRemoveItem = (id: number) => {
     const nuevoCarrito = carrito.filter((item) => item.id !== id);
     guardarCarrito(nuevoCarrito);
+  };
+
+  // Helper para renderizar texto de forma segura (evita error de Objetos como hijos)
+  const renderSafe = (value: any, fallback: string) => {
+    if (typeof value === "string" || typeof value === "number") {
+      return value;
+    }
+    return fallback;
   };
 
   return (
@@ -294,16 +307,17 @@ export default function CarritoPage() {
                 <h5>Datos del Comprador</h5>
                 <p className="mb-1">
                   <strong>Nombre:</strong>{" "}
-                  {currentUser.nombre ||
-                    currentUser.nombreUsuario ||
-                    "Sin Nombre Registrado"}
+                  {renderSafe(
+                    currentUser.nombre || currentUser.nombreUsuario,
+                    "Sin Nombre Registrado"
+                  )}
                 </p>
                 <p className="mb-1">
-                  <strong>Correo:</strong> {currentUser.correo}
+                  <strong>Correo:</strong> {renderSafe(currentUser.correo, "")}
                 </p>
                 <p className="mb-1">
                   <strong>Dirección:</strong>{" "}
-                  {currentUser.direccion || "Cargando..."}
+                  {renderSafe(currentUser.direccion, "Cargando...")}
                 </p>
               </div>
 
