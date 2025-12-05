@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Button, Form, Modal } from "react-bootstrap";
+import { Button, Form, Modal, Spinner } from "react-bootstrap";
 import { Juego } from "@/app/juegos";
 
 interface CartItem extends Juego {
@@ -21,6 +21,8 @@ export default function CarritoPage() {
   const [total, setTotal] = useState(0);
   const [showCheckoutModal, setShowCheckoutModal] = useState(false);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false); // Nuevo estado para carga
+
   const isLoggedIn = !!currentUser;
 
   useEffect(() => {
@@ -45,10 +47,51 @@ export default function CarritoPage() {
     window.location.href = "/paginas/iniciarsesion";
   };
 
-  const handlePurchaseSuccess = () => {
-    guardarCarrito([]);
-    handleCloseCheckout();
+  // --- AQUÍ ESTÁ LA LÓGICA NUEVA PARA GUARDAR EN BBDD ---
+  const handlePurchaseSuccess = async () => {
+    if (!currentUser) return;
+
+    setIsProcessing(true); // Bloqueamos el botón
+
+    try {
+      const baseUrl =
+        process.env.NEXT_PUBLIC_API_PRODUCTS ||
+        "https://ms-products-db-production.up.railway.app";
+
+      const ventaData = {
+        nombreUsuario: currentUser.nombre,
+        correoUsuario: currentUser.correo,
+        // El numeroVenta se genera solo en la BBDD
+      };
+
+      const response = await fetch(`${baseUrl}/ventas`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(ventaData),
+      });
+
+      if (response.ok) {
+        const ventaGuardada = await response.json();
+        alert(
+          `✅ Compra realizada con éxito. Nº de orden: ${ventaGuardada.numeroVenta}`
+        );
+
+        // Limpiamos el carrito solo si se guardó en BBDD
+        guardarCarrito([]);
+        handleCloseCheckout();
+      } else {
+        alert("❌ Error al procesar la compra en el servidor.");
+      }
+    } catch (error) {
+      console.error(error);
+      alert("❌ Error de conexión al guardar la venta.");
+    } finally {
+      setIsProcessing(false); // Desbloqueamos el botón
+    }
   };
+  // ------------------------------------------------------
 
   const cargarCarrito = () => {
     const carritoGuardado = JSON.parse(localStorage.getItem("carrito") || "[]");
@@ -113,7 +156,7 @@ export default function CarritoPage() {
                   <a href={item.infoPage} className="text-decoration-none">
                     <h3>{item.title}</h3>
                   </a>
-                  <span className="cart-price" data-price={item.price}>
+                  <span className="cart-price">
                     USD {item.price.toFixed(2)}
                   </span>
                 </div>
@@ -186,7 +229,7 @@ export default function CarritoPage() {
           {isLoggedIn && currentUser ? (
             <div className="text-white">
               <h4 className="text-center text-success mb-4">
-                ✅ ¡Tu compra ha sido realizada con éxito!
+                Confirmar Compra
               </h4>
 
               <div className="mb-4 p-3 bg-dark rounded border border-secondary">
@@ -198,45 +241,39 @@ export default function CarritoPage() {
                   <strong>Correo:</strong> {currentUser.correo}
                 </p>
                 <p className="mb-1">
-                  <strong>Dirección:</strong>
-                  {currentUser.comuna || "N/A"}, {currentUser.region || "N/A"}
+                  <strong>Dirección:</strong> {currentUser.comuna || "N/A"},{" "}
+                  {currentUser.region || "N/A"}
                 </p>
               </div>
 
               <div className="mb-4">
-                <h5>Resumen de la Compra</h5>
-                {carrito.map((item) => (
-                  <div
-                    key={item.id}
-                    className="d-flex justify-content-between align-items-center mb-2 p-2 bg-dark rounded"
-                  >
-                    <img
-                      src={item.imageSrc}
-                      alt={item.title}
-                      width={50}
-                      height={50}
-                      className="rounded me-2"
-                      style={{ objectFit: "cover" }}
-                    />
-                    <span className="flex-grow-1">
-                      {item.title} (x{item.cantidad})
-                    </span>
-                    <span>${(item.price * item.cantidad).toFixed(2)}</span>
-                  </div>
-                ))}
-                <hr className="border-secondary" />
+                <h5>Resumen</h5>
                 <div className="d-flex justify-content-between fs-5 fw-bold">
-                  <span>TOTAL:</span>
+                  <span>TOTAL A PAGAR:</span>
                   <span>${total.toFixed(2)}</span>
                 </div>
               </div>
 
               <Button
-                variant="primary"
+                variant="success"
                 onClick={handlePurchaseSuccess}
                 className="w-100"
+                disabled={isProcessing}
               >
-                Finalizar
+                {isProcessing ? (
+                  <>
+                    <Spinner
+                      as="span"
+                      animation="border"
+                      size="sm"
+                      role="status"
+                      aria-hidden="true"
+                    />{" "}
+                    Procesando...
+                  </>
+                ) : (
+                  "Confirmar y Finalizar"
+                )}
               </Button>
             </div>
           ) : (
