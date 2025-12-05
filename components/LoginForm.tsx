@@ -1,42 +1,72 @@
 "use client";
 import { useState } from "react";
-
-interface User {
-  nombre: string;
-  correo: string;
-  password: string;
-}
+import { useRouter } from "next/navigation"; // Importamos useRouter para redirigir mejor
 
 export default function LoginForm() {
+  const router = useRouter(); // Hook para navegación
   const [correo, setCorreo] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false); // Para mostrar carga
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
+    setIsLoading(true);
 
     if (!correo || !password) {
       setError("Por favor, completa todos los campos.");
+      setIsLoading(false);
       return;
     }
 
-    const storedUsers: User[] = JSON.parse(
-      localStorage.getItem("registeredUsers") || "[]"
-    );
+    try {
+      // 1. Definimos la URL (apuntando a tu backend de Productos)
+      // Asegúrate de usar la variable de entorno correcta
+      const baseUrl =
+        process.env.NEXT_PUBLIC_API_PRODUCTS ||
+        "https://ms-products-db-production.up.railway.app";
+      const url = `${baseUrl}/usuarios/login`;
 
-    const userFound = storedUsers.find(
-      (user) => user.correo === correo && user.password === password
-    );
+      // 2. Hacemos la petición al Backend
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        // Enviamos solo correo y password (el backend espera un objeto Usuario)
+        body: JSON.stringify({ correo, password }),
+      });
 
-    if (userFound) {
-      // ✅ Guardar sesión
-      localStorage.setItem("usuario", JSON.stringify(userFound));
+      if (response.ok) {
+        // --- ÉXITO: LOGIN CORRECTO ---
+        const userFound = await response.json();
 
-      alert(`✅ ¡Bienvenido, ${userFound.nombre}!`);
-      window.location.href = "/"; // Redirige al inicio
-    } else {
-      setError("❌ Correo o contraseña incorrectos.");
+        // Guardamos la sesión en localStorage
+        localStorage.setItem("usuario", JSON.stringify(userFound));
+
+        alert(
+          `✅ ¡Bienvenido de nuevo, ${
+            userFound.nombreUsuario || userFound.nombre
+          }!`
+        ); // Ajusta según como se llame el campo en tu entidad
+
+        // Redirigimos al inicio
+        // window.location.href = "/"; // Forma antigua
+        router.push("/"); // Forma optimizada de Next.js
+      } else {
+        // --- ERROR: DATOS INCORRECTOS ---
+        if (response.status === 401) {
+          setError("❌ Correo o contraseña incorrectos.");
+        } else {
+          setError("❌ Ocurrió un error en el servidor.");
+        }
+      }
+    } catch (err) {
+      console.error(err);
+      setError("❌ Error de conexión. Intenta más tarde.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -51,7 +81,7 @@ export default function LoginForm() {
         onChange={(e) => setCorreo(e.target.value)}
         required
         maxLength={100}
-        pattern="^[a-zA-Z0-9._%+-]+@(duoc\\.cl|profesor\\.duoc\\.cl|gmail\\.com)$"
+        // pattern="^[a-zA-Z0-9._%+-]+@(duoc\\.cl|profesor\\.duoc\\.cl|gmail\\.com)$" // Opcional: puedes quitarlo para ser más flexible en login
       />
 
       <label htmlFor="password">Contraseña:</label>
@@ -72,8 +102,8 @@ export default function LoginForm() {
         </div>
       )}
 
-      <button type="submit" style={{ marginTop: "1rem" }}>
-        Ingresar
+      <button type="submit" style={{ marginTop: "1rem" }} disabled={isLoading}>
+        {isLoading ? "Verificando..." : "Ingresar"}
       </button>
     </form>
   );
