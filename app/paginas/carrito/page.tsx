@@ -8,14 +8,16 @@ interface CartItem extends Juego {
   cantidad: number;
 }
 
+// Interfaz flexible para evitar errores si las propiedades cambian de nombre
 interface User {
-  nombre: string;
+  nombre?: string;
+  nombreUsuario?: string; // Agregado por si el backend lo envía así
   correo: string;
-  // Hacemos opcionales estos campos para que no fallen si no existen al principio
   region?: string;
   comuna?: string;
   telefono?: string;
   direccion?: string;
+  [key: string]: any; // Permite otras propiedades dinámicas
 }
 
 export default function CarritoPage() {
@@ -27,7 +29,6 @@ export default function CarritoPage() {
 
   const isLoggedIn = !!currentUser;
 
-  // Definimos la URL base aquí para usarla en ambas peticiones (Usuarios y Ventas)
   const baseUrl =
     process.env.NEXT_PUBLIC_API_PRODUCTS ||
     "https://ms-products-db-production.up.railway.app";
@@ -35,15 +36,13 @@ export default function CarritoPage() {
   useEffect(() => {
     cargarCarrito();
 
-    // 1. Cargar usuario básico del LocalStorage (lo que guardó el Login)
     try {
       const storedUser = localStorage.getItem("usuario");
       if (storedUser) {
         const localUser = JSON.parse(storedUser);
+        console.log("Usuario Local:", localUser); // 🔍 Revisa en consola qué nombre tiene aquí
         setCurrentUser(localUser);
 
-        // 2. CONECTAR AL BACKEND: Buscar datos completos (Dirección, Región, etc.)
-        // Si el usuario tiene correo, vamos a buscar sus detalles a la BBDD
         if (localUser.correo) {
           obtenerDatosUsuarioDesdeBackend(localUser.correo, localUser);
         }
@@ -54,24 +53,19 @@ export default function CarritoPage() {
     }
   }, []);
 
-  // --- NUEVA FUNCIÓN: Obtener datos reales de la BBDD ---
   const obtenerDatosUsuarioDesdeBackend = async (
     correo: string,
     usuarioLocal: User
   ) => {
     try {
-      // AJUSTA ESTA RUTA según tu UsuarioController.
-      // Por ejemplo: /usuarios/buscar?correo=...
       const response = await fetch(
         `${baseUrl}/usuarios/buscar?correo=${correo}`
       );
 
       if (response.ok) {
         const datosBackend = await response.json();
-        console.log("Datos frescos del usuario recibidos:", datosBackend);
+        console.log("Datos Backend:", datosBackend); // 🔍 Revisa si aquí viene 'nombre' o 'nombreUsuario'
 
-        // Mezclamos lo local con lo que viene de la base de datos
-        // Los datos del backend (datosBackend) sobrescribirán a los locales si existen
         setCurrentUser({
           ...usuarioLocal,
           ...datosBackend,
@@ -85,7 +79,6 @@ export default function CarritoPage() {
       console.error("Error conectando con el servicio de usuarios:", error);
     }
   };
-  // -------------------------------------------------------
 
   const handleCloseCheckout = () => setShowCheckoutModal(false);
   const handleShowCheckout = () => setShowCheckoutModal(true);
@@ -101,11 +94,13 @@ export default function CarritoPage() {
     setIsProcessing(true);
 
     try {
-      // Construimos el objeto Venta con los datos del estado
+      // Intentamos obtener el nombre de cualquiera de las dos propiedades posibles
+      const nombreFinal =
+        currentUser.nombre || currentUser.nombreUsuario || "Usuario";
+
       const ventaData = {
-        nombreUsuario: currentUser.nombre,
+        nombreUsuario: nombreFinal,
         correoUsuario: currentUser.correo,
-        // ✅ AQUÍ AGREGAMOS LA DIRECCIÓN PARA QUE SE GUARDE EN LA BASE DE DATOS
         direccion: currentUser.direccion || "Sin dirección registrada",
         comuna: currentUser.comuna || "N/A",
         region: currentUser.region || "N/A",
@@ -125,7 +120,6 @@ export default function CarritoPage() {
       if (response.ok) {
         const ventaGuardada = await response.json();
 
-        // Mostramos confirmación con los datos reales que retornó el backend
         alert(
           `✅ Compra realizada con éxito.\n\n` +
             `Nº de Orden: ${ventaGuardada.id || ventaGuardada.numeroVenta}\n` +
@@ -288,20 +282,20 @@ export default function CarritoPage() {
               <div className="mb-4 p-3 bg-dark rounded border border-secondary">
                 <h5>Datos del Comprador</h5>
                 <p className="mb-1">
-                  <strong>Nombre:</strong> {currentUser.nombre}
+                  {/* Aquí mostramos nombre O nombreUsuario O un texto por defecto */}
+                  <strong>Nombre:</strong>{" "}
+                  {currentUser.nombre ||
+                    currentUser.nombreUsuario ||
+                    "Sin Nombre Registrado"}
                 </p>
                 <p className="mb-1">
                   <strong>Correo:</strong> {currentUser.correo}
                 </p>
-                {/* Visualización de datos traídos de la BBDD */}
                 <p className="mb-1">
                   <strong>Dirección:</strong>{" "}
                   {currentUser.direccion || "Cargando..."}
                 </p>
-                <p className="mb-1">
-                  <strong>Ubicación:</strong> {currentUser.comuna || "-"},{" "}
-                  {currentUser.region || "-"}
-                </p>
+                {/* SE ELIMINÓ LA SECCIÓN "UBICACIÓN" (COMUNA/REGIÓN) */}
               </div>
 
               <div className="mb-4">
