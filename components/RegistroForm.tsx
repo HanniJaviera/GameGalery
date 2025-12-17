@@ -87,6 +87,7 @@ export default function RegistroForm() {
       celular: formData.telefono,
       // Unimos Comuna y Región en un solo string para 'direccion'
       direccion: `${formData.comuna}, ${formData.region}`,
+      comuna: formData.comuna,
       // Enviamos la contraseña (Asegúrate de haber actualizado tu Java Entity)
       password: formData.password,
     };
