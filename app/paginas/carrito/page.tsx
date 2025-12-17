@@ -36,6 +36,8 @@ export default function CarritoPage() {
   // Estados para el Clima
   const [weatherData, setWeatherData] = useState<WeatherData | null>(null);
   const [weatherLoading, setWeatherLoading] = useState(false);
+  // Nuevo estado para mostrar errores de clima en pantalla
+  const [weatherError, setWeatherError] = useState<string | null>(null);
 
   const isLoggedIn = !!currentUser;
 
@@ -78,10 +80,16 @@ export default function CarritoPage() {
   const fetchWeather = useCallback(
     async (city: string) => {
       // Validaciones básicas
-      if (!city || city === "N/A" || city === "Cargando...") return;
+      if (!city || city === "N/A" || city === "Cargando...") {
+        setWeatherError(
+          "No hay una comuna válida registrada para consultar el clima."
+        );
+        return;
+      }
 
       setWeatherLoading(true);
       setWeatherData(null);
+      setWeatherError(null);
 
       // Limpiamos el nombre de la ciudad
       const cleanedCity = city.split(",")[0].trim();
@@ -98,18 +106,28 @@ export default function CarritoPage() {
           const data = await response.json();
 
           // Mapeamos la respuesta que viene de Java
-          setWeatherData({
-            temp: Math.round(data.main.temp),
-            description: data.weather[0].description,
-            icon: data.weather[0].icon,
-            city: data.name,
-          });
-          console.log("☁️ Clima obtenido desde Java para:", cleanedCity);
+          if (data.main && data.weather) {
+            setWeatherData({
+              temp: Math.round(data.main.temp),
+              description: data.weather[0].description,
+              icon: data.weather[0].icon,
+              city: data.name,
+            });
+            console.log("☁️ Clima obtenido desde Java para:", cleanedCity);
+          } else {
+            setWeatherError(
+              "Datos de clima incompletos recibidos del servidor."
+            );
+          }
         } else {
           console.warn(`Backend no pudo obtener clima para ${cleanedCity}`);
+          setWeatherError(
+            `No se pudo cargar el clima (Error ${response.status}). Revisa si el Backend está actualizado.`
+          );
         }
       } catch (error) {
         console.error("❌ Error servicio clima:", error);
+        setWeatherError("Error de conexión al cargar el clima.");
       } finally {
         setWeatherLoading(false);
       }
@@ -178,7 +196,11 @@ export default function CarritoPage() {
     setShowCheckoutModal(true);
     // Intentamos recargar el clima al abrir el modal si ya tenemos datos
     if (currentUser?.comuna) {
+      console.log("Intentando cargar clima para comuna:", currentUser.comuna);
       fetchWeather(currentUser.comuna);
+    } else {
+      console.log("No hay comuna registrada en el usuario actual.");
+      setWeatherError("Agrega una comuna a tu perfil para ver el clima.");
     }
   };
 
@@ -268,6 +290,17 @@ export default function CarritoPage() {
         </div>
       );
     }
+
+    // Si hay error, lo mostramos en rojo claro
+    if (weatherError) {
+      return (
+        <div className="alert alert-warning text-center small mb-3 p-2">
+          <i className="bi bi-exclamation-triangle me-2"></i>
+          {weatherError}
+        </div>
+      );
+    }
+
     if (weatherData) {
       return (
         <div className="bg-info bg-opacity-25 border border-info rounded p-3 mb-4 d-flex align-items-center justify-content-between">
@@ -398,7 +431,7 @@ export default function CarritoPage() {
                 Confirmar Compra
               </h4>
 
-              {/* Widget de Clima (Sin comentarios tipo // en JSX) */}
+              {/* Widget de Clima */}
               <WeatherWidget />
 
               <div className="mb-4 p-3 bg-dark rounded border border-secondary">
