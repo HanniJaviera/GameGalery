@@ -16,7 +16,6 @@ interface User {
   comuna?: string;
   telefono?: string;
   direccion?: string;
-  // CORRECCIÓN: Cambiamos 'any' por 'unknown' para satisfacer al linter
   [key: string]: unknown;
 }
 
@@ -34,19 +33,16 @@ export default function CarritoPage() {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
 
+  // Estados para el Clima
   const [weatherData, setWeatherData] = useState<WeatherData | null>(null);
   const [weatherLoading, setWeatherLoading] = useState(false);
 
   const isLoggedIn = !!currentUser;
 
-  // CORRECCIÓN: Evitamos usar process.env directamente ya que puede no estar definido en el navegador
+  // URL de tu Backend Java (Railway)
   const baseUrl = "https://ms-products-db-production.up.railway.app";
 
-  //Key de la API
-  const CLIMA_API_KEY =
-    "404fe577ee8921c5b902a764daca8b81eed6e5c30f6bf18eee2585a3d7f112d3";
-  // Usamos useCallback para que estas funciones sean estables
-
+  // --- 1. LÓGICA DEL CARRITO ---
   const calcularTotal = useCallback((items: CartItem[]) => {
     const nuevoTotal = items.reduce(
       (acc, item) => acc + item.price * item.cantidad,
@@ -78,44 +74,50 @@ export default function CarritoPage() {
     }
   }, [calcularTotal]);
 
-  // --- INTEGRACIÓN API EXTERNA (CLIMA) ---
+  // --- 2. INTEGRACIÓN CLIMA (SEGURA VÍA BACKEND) ---
   const fetchWeather = useCallback(
     async (city: string) => {
-      // Si no hay ciudad válida, no llamamos a la API
+      // Validaciones básicas
       if (!city || city === "N/A" || city === "Cargando...") return;
 
       setWeatherLoading(true);
       setWeatherData(null);
 
-      // Limpiamos el nombre (ej: "Santiago, Chile" -> "Santiago")
+      // Limpiamos el nombre de la ciudad
       const cleanedCity = city.split(",")[0].trim();
 
       try {
-        // Llamada a la API Pública
-        const weatherUrl = `https://api.openweathermap.org/data/2.5/weather?q=${cleanedCity},CL&units=metric&lang=es&appid=${CLIMA_API_KEY}`;
+        // CORRECCIÓN DE SEGURIDAD:
+        // Llamamos a TU backend Java, no a OpenWeatherMap directamente.
+        // Así la API Key se queda oculta en el servidor.
+        const response = await fetch(
+          `${baseUrl}/clima?ciudad=${encodeURIComponent(cleanedCity)}`
+        );
 
-        const response = await fetch(weatherUrl);
         if (response.ok) {
           const data = await response.json();
+
+          // Mapeamos la respuesta que viene de Java
           setWeatherData({
             temp: Math.round(data.main.temp),
             description: data.weather[0].description,
-            icon: data.weather[0].icon, // Código de icono (ej: "04d")
+            icon: data.weather[0].icon,
             city: data.name,
           });
-          console.log("☁️ Clima obtenido para:", cleanedCity);
+          console.log("☁️ Clima obtenido desde Java para:", cleanedCity);
         } else {
-          console.warn(`No se pudo cargar el clima para ${cleanedCity}`);
+          console.warn(`Backend no pudo obtener clima para ${cleanedCity}`);
         }
       } catch (error) {
-        console.error("❌ Error API Clima:", error);
+        console.error("❌ Error servicio clima:", error);
       } finally {
         setWeatherLoading(false);
       }
     },
-    [CLIMA_API_KEY]
+    [baseUrl]
   );
 
+  // --- 3. INTEGRACIÓN USUARIOS (BACKEND) ---
   const obtenerDatosUsuarioDesdeBackend = useCallback(
     async (correo: string, usuarioLocal: User) => {
       console.log("🔍 Buscando datos frescos en BBDD para:", correo);
@@ -135,8 +137,7 @@ export default function CarritoPage() {
 
           setCurrentUser(usuarioCompleto);
 
-          // ✨ PUNTO DE INTEGRACIÓN:
-          // Una vez tenemos la Comuna desde la BBDD, llamamos a la API de Clima
+          // Si el usuario tiene comuna, cargamos el clima automáticamente
           if (usuarioCompleto.comuna) {
             fetchWeather(usuarioCompleto.comuna);
           }
@@ -147,9 +148,10 @@ export default function CarritoPage() {
         console.error("❌ Error conectando con la base de datos:", error);
       }
     },
-    [baseUrl]
+    [baseUrl, fetchWeather]
   );
 
+  // --- EFECTOS ---
   useEffect(() => {
     cargarCarrito();
 
@@ -169,10 +171,12 @@ export default function CarritoPage() {
     }
   }, [cargarCarrito, obtenerDatosUsuarioDesdeBackend]);
 
+  // --- HANDLERS ---
   const handleCloseCheckout = () => setShowCheckoutModal(false);
+
   const handleShowCheckout = () => {
-    // Intentamos recargar el clima si ya tenemos usuario al abrir el modal
     setShowCheckoutModal(true);
+    // Intentamos recargar el clima al abrir el modal si ya tenemos datos
     if (currentUser?.comuna) {
       fetchWeather(currentUser.comuna);
     }
@@ -185,14 +189,12 @@ export default function CarritoPage() {
 
   const handlePurchaseSuccess = async () => {
     if (!currentUser) return;
-
     setIsProcessing(true);
 
     try {
       const nombreFinal =
         currentUser.nombre || currentUser.nombreUsuario || "Usuario";
 
-      // Aseguramos que la dirección sea un string
       const direccionFinal =
         typeof currentUser.direccion === "string"
           ? currentUser.direccion
@@ -207,31 +209,23 @@ export default function CarritoPage() {
         total: total,
       };
 
-      console.log("Enviando venta al backend:", ventaData);
-
       const response = await fetch(`${baseUrl}/ventas`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(ventaData),
       });
 
       if (response.ok) {
         const ventaGuardada = await response.json();
-
         alert(
           `✅ Compra realizada con éxito.\n\n` +
             `Nº de Orden: ${ventaGuardada.id || ventaGuardada.numeroVenta}\n` +
             `Cliente: ${ventaGuardada.nombreUsuario}\n` +
             `Enviado a: ${ventaGuardada.direccion || currentUser.direccion}`
         );
-
         guardarCarrito([]);
         handleCloseCheckout();
       } else {
-        const errorMsg = await response.text();
-        console.error("Error respuesta:", errorMsg);
         alert("❌ Error al procesar la compra en el servidor.");
       }
     } catch (error) {
@@ -258,14 +252,14 @@ export default function CarritoPage() {
     guardarCarrito(nuevoCarrito);
   };
 
-  // Helper para renderizar texto de forma segura (evita error de Objetos como hijos)
   const renderSafe = (value: unknown, fallback: string) => {
     if (typeof value === "string" || typeof value === "number") {
       return value;
     }
     return fallback;
   };
-  // --- COMPONENTE VISUAL PARA EL CLIMA ---
+
+  // --- WIDGET CLIMA ---
   const WeatherWidget = () => {
     if (weatherLoading) {
       return (
@@ -274,7 +268,6 @@ export default function CarritoPage() {
         </div>
       );
     }
-
     if (weatherData) {
       return (
         <div className="bg-info bg-opacity-25 border border-info rounded p-3 mb-4 d-flex align-items-center justify-content-between">
@@ -299,8 +292,7 @@ export default function CarritoPage() {
         </div>
       );
     }
-
-    return null; // Si no hay datos, no mostramos nada
+    return null;
   };
 
   return (
@@ -405,8 +397,10 @@ export default function CarritoPage() {
               <h4 className="text-center text-success mb-4">
                 Confirmar Compra
               </h4>
-              //visualizar el widget del clima
+
+              {/* Widget de Clima (Sin comentarios tipo // en JSX) */}
               <WeatherWidget />
+
               <div className="mb-4 p-3 bg-dark rounded border border-secondary">
                 <h5>Datos del Comprador</h5>
                 <p className="mb-1">
@@ -425,6 +419,7 @@ export default function CarritoPage() {
                   {currentUser.comuna ? ` (${currentUser.comuna})` : ""}
                 </p>
               </div>
+
               <div className="mb-4">
                 <h5>Resumen</h5>
                 <div className="d-flex justify-content-between fs-5 fw-bold">
@@ -432,6 +427,7 @@ export default function CarritoPage() {
                   <span>${total.toFixed(2)}</span>
                 </div>
               </div>
+
               <Button
                 variant="success"
                 onClick={handlePurchaseSuccess}
