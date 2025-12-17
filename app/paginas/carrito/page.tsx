@@ -16,9 +16,10 @@ interface User {
   comuna?: string;
   telefono?: string;
   direccion?: string;
-  // Campos raw del backend para referencia
+  // Campos raw del backend para referencia durante el mapeo
   usuario_direccion?: string;
   usuario_nombre?: string;
+  usuario_celular?: string;
   [key: string]: unknown;
 }
 
@@ -43,7 +44,8 @@ export default function CarritoPage() {
 
   const isLoggedIn = !!currentUser;
 
-  // URL de tu Backend Java (Railway)
+  // URL ÚNICA DEL BACKEND
+  // Ahora este backend maneja Usuarios, Ventas y también el Clima (como proxy)
   const baseUrl = "https://ms-products-db-production.up.railway.app";
 
   // --- 1. LÓGICA DEL CARRITO ---
@@ -78,11 +80,12 @@ export default function CarritoPage() {
     }
   }, [calcularTotal]);
 
-  // --- 2. INTEGRACIÓN CLIMA ---
+  // --- 2. INTEGRACIÓN CLIMA (VÍA TU BACKEND) ---
   const fetchWeather = useCallback(
     async (city: string) => {
+      // Validaciones básicas antes de llamar al servidor
       if (!city || city === "N/A" || city === "Cargando...") {
-        setWeatherError("No hay una ubicación válida para consultar el clima.");
+        setWeatherError("Agrega una dirección para ver el clima.");
         return;
       }
 
@@ -90,22 +93,29 @@ export default function CarritoPage() {
       setWeatherData(null);
       setWeatherError(null);
 
-      // Intentamos limpiar la ciudad (ej: "Santiago, Chile" -> "Santiago")
+      // Limpiamos la ciudad (ej: "Santiago, Chile" -> "Santiago")
       const cleanedCity = city.split(",")[0].trim();
 
       try {
+        console.log(`🌐 Solicitando clima al Backend para: ${cleanedCity}`);
+
+        // Llamada simplificada a tu propio endpoint
         const response = await fetch(
           `${baseUrl}/clima?ciudad=${encodeURIComponent(cleanedCity)}`
         );
 
         if (response.ok) {
           const data = await response.json();
-          if (data.main && data.weather) {
+          console.log("📦 Respuesta del Backend (Clima):", data);
+
+          // Tu servicio Java devuelve una estructura normalizada:
+          // { name: "...", main: { temp: X }, weather: [{ description: "...", icon: "..." }] }
+          if (data.main) {
             setWeatherData({
               temp: Math.round(data.main.temp),
-              description: data.weather[0].description,
-              icon: data.weather[0].icon,
-              city: data.name,
+              description: data.weather?.[0]?.description || "Clima actual",
+              icon: data.weather?.[0]?.icon || "01d",
+              city: data.name || cleanedCity,
             });
           } else {
             setWeatherError(
@@ -113,14 +123,17 @@ export default function CarritoPage() {
             );
           }
         } else {
-          console.warn(`Backend no pudo obtener clima para ${cleanedCity}`);
+          // Manejo de errores HTTP (404 si no encuentra la ciudad, 500 si falla la API externa)
+          console.warn(
+            `Backend respondió status ${response.status} para clima.`
+          );
           setWeatherError(
-            `No se encontró clima para "${cleanedCity}". Intenta editar tu dirección.`
+            `No se pudo obtener el clima para "${cleanedCity}". Verifica que la ciudad exista.`
           );
         }
       } catch (error) {
-        console.error("❌ Error servicio clima:", error);
-        setWeatherError("Error de conexión al cargar el clima.");
+        console.error("❌ Error de conexión con el backend:", error);
+        setWeatherError("Servicio de clima no disponible momentáneamente.");
       } finally {
         setWeatherLoading(false);
       }
@@ -128,7 +141,7 @@ export default function CarritoPage() {
     [baseUrl]
   );
 
-  // --- 3. INTEGRACIÓN USUARIOS (BACKEND) ---
+  // --- 3. INTEGRACIÓN USUARIOS ---
   const obtenerDatosUsuarioDesdeBackend = useCallback(
     async (correo: string, usuarioLocal: User) => {
       console.log("🔍 Buscando datos frescos en BBDD para:", correo);
@@ -141,47 +154,39 @@ export default function CarritoPage() {
           const datosBackend = await response.json();
           console.log("✅ Datos RAW del backend (UsuarioDTO):", datosBackend);
 
-          // --- MAPEO CRÍTICO BASADO EN TU UsuarioDTO ---
-          // Tu DTO usa @JsonProperty("usuario_direccion"), etc.
-          // Aquí traducimos esas llaves raras a las que usa nuestro Frontend.
+          // Mapeo defensivo: Tu DTO devuelve campos como 'usuario_celular'
+          // Aquí los convertimos al formato que usa el frontend ('telefono')
           const usuarioMapeado = {
-            ...usuarioLocal, // Mantiene lo que ya tenías en local (token, etc.)
-            ...datosBackend, // Guarda los datos raw por si acaso
-
-            // Mapeo explícito según tu UsuarioDTO:
-            // "usuario_direccion" -> direccion
+            ...usuarioLocal,
+            ...datosBackend,
             direccion:
               datosBackend.usuario_direccion ||
               datosBackend.direccion ||
               usuarioLocal.direccion,
-
-            // "usuario_nombre" -> nombreUsuario
             nombreUsuario:
               datosBackend.usuario_nombre ||
               datosBackend.nombreUsuario ||
               usuarioLocal.nombreUsuario,
-
-            // "usuario_correo" -> correo
             correo:
               datosBackend.usuario_correo ||
               datosBackend.correo ||
               usuarioLocal.correo,
-
-            // IDs
+            telefono:
+              datosBackend.usuario_celular ||
+              datosBackend.celular ||
+              usuarioLocal.telefono,
             id: datosBackend.usuario_id || datosBackend.id,
           };
 
           console.log("🔄 Usuario mapeado final:", usuarioMapeado);
           setCurrentUser(usuarioMapeado as User);
 
-          // Intentar cargar clima si encontramos dirección
+          // Si recuperamos una dirección/comuna, cargamos el clima automáticamente
           const ubicacionClima =
             usuarioMapeado.comuna || usuarioMapeado.direccion;
           if (ubicacionClima) {
             fetchWeather(ubicacionClima);
           }
-        } else {
-          console.warn("⚠️ No se encontró información extra en el backend.");
         }
       } catch (error) {
         console.error("❌ Error conectando con la base de datos:", error);
@@ -197,10 +202,8 @@ export default function CarritoPage() {
       const storedUser = localStorage.getItem("usuario");
       if (storedUser) {
         const localUser = JSON.parse(storedUser);
-        // Inicializamos con lo local primero
         setCurrentUser(localUser);
-
-        // Luego intentamos actualizar desde el backend
+        // Actualizamos datos frescos al cargar la página
         if (localUser.correo) {
           obtenerDatosUsuarioDesdeBackend(localUser.correo, localUser);
         }
@@ -217,18 +220,13 @@ export default function CarritoPage() {
   const handleShowCheckout = () => {
     setShowCheckoutModal(true);
 
-    console.log("👤 Usuario al abrir checkout:", currentUser);
-
+    // Verificamos si tenemos datos para pedir el clima
     const ubicacionParaClima = currentUser?.comuna || currentUser?.direccion;
 
     if (ubicacionParaClima) {
-      console.log("📍 Ubicación detectada para clima:", ubicacionParaClima);
-      // Solo llamamos si no tenemos datos ya cargados para evitar spam
-      if (!weatherData) {
-        fetchWeather(ubicacionParaClima);
-      }
+      // Solo pedimos si no tenemos datos ya (para no spamear al backend)
+      if (!weatherData) fetchWeather(ubicacionParaClima);
     } else {
-      console.log("❌ No se detectó comuna ni dirección.");
       setWeatherError("Agrega una dirección a tu perfil para ver el clima.");
     }
   };
@@ -245,18 +243,10 @@ export default function CarritoPage() {
     try {
       const nombreFinal =
         currentUser.nombre || currentUser.nombreUsuario || "Usuario";
-
       const direccionFinal =
-        typeof currentUser.direccion === "string" &&
-        currentUser.direccion.trim() !== ""
-          ? currentUser.direccion
-          : "Sin dirección registrada";
+        currentUser.direccion || "Sin dirección registrada";
 
-      // --- CONSTRUCCIÓN DE VentaDTO ---
-      // Basado en tu clase Java: VentaDTO
-      // Solo tiene: nombreUsuario, correoUsuario, direccion, total.
-      // NO enviamos comuna ni region porque el DTO no los tiene.
-
+      // Preparamos el objeto exacto que espera tu VentaDTO
       const ventaData = {
         nombreUsuario: nombreFinal,
         correoUsuario: currentUser.correo,
@@ -276,56 +266,48 @@ export default function CarritoPage() {
         const ventaGuardada = await response.json();
         alert(
           `✅ Compra realizada con éxito.\n\n` +
-            `Nº de Orden: ${ventaGuardada.numeroVenta || ventaGuardada.id}\n` + // Venta entity usa numeroVenta
-            `Cliente: ${ventaGuardada.nombreUsuario}\n` +
+            `Nº de Orden: ${ventaGuardada.numeroVenta || ventaGuardada.id}\n` +
             `Total: $${ventaGuardada.total}`
         );
         guardarCarrito([]);
         handleCloseCheckout();
       } else {
         const errorText = await response.text();
-        console.error("Error servidor:", errorText);
-        alert(
-          "❌ Error al procesar la compra en el servidor. Revisa la consola."
-        );
+        console.error("Error servidor venta:", errorText);
+        alert("❌ Error al procesar la compra. Revisa tus datos.");
       }
     } catch (error) {
-      console.error(error);
-      alert("❌ Error de conexión al guardar la venta.");
+      console.error("Error red venta:", error);
+      alert("❌ Error de conexión al procesar la venta.");
     } finally {
       setIsProcessing(false);
     }
   };
 
-  const handleUpdateCantidad = (id: number, nuevaCantidad: number) => {
-    if (nuevaCantidad < 1) {
+  const handleUpdateCantidad = (id: number, val: number) => {
+    if (val < 1) {
       handleRemoveItem(id);
       return;
     }
-    const nuevoCarrito = carrito.map((item) =>
-      item.id === id ? { ...item, cantidad: nuevaCantidad } : item
+    const updated = carrito.map((i) =>
+      i.id === id ? { ...i, cantidad: val } : i
     );
-    guardarCarrito(nuevoCarrito);
+    guardarCarrito(updated);
   };
 
   const handleRemoveItem = (id: number) => {
-    const nuevoCarrito = carrito.filter((item) => item.id !== id);
-    guardarCarrito(nuevoCarrito);
+    guardarCarrito(carrito.filter((i) => i.id !== id));
   };
 
-  const renderSafe = (value: unknown, fallback: string) => {
-    if (typeof value === "string" && value.trim() !== "") {
-      return value;
-    }
-    return fallback;
-  };
+  const renderSafe = (v: unknown, f: string) =>
+    typeof v === "string" && v.trim() ? v : f;
 
-  // --- WIDGET CLIMA ---
+  // Widget de Clima
   const WeatherWidget = () => {
     if (weatherLoading) {
       return (
         <div className="text-center text-info mb-3">
-          <Spinner size="sm" animation="border" /> Cargando clima en tu zona...
+          <Spinner size="sm" animation="border" /> Consultando clima...
         </div>
       );
     }
@@ -333,8 +315,7 @@ export default function CarritoPage() {
     if (weatherError) {
       return (
         <div className="alert alert-warning text-center small mb-3 p-2">
-          <i className="bi bi-exclamation-triangle me-2"></i>
-          {weatherError}
+          <i className="bi bi-exclamation-triangle me-2"></i> {weatherError}
         </div>
       );
     }
@@ -349,12 +330,14 @@ export default function CarritoPage() {
             </small>
           </div>
           <div className="d-flex align-items-center">
+            {/* Usamos iconos de OpenWeather para consistencia visual */}
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={`https://openweathermap.org/img/wn/${weatherData.icon}.png`}
-              alt="Icono clima"
+              alt="Icono"
               width={50}
               height={50}
+              onError={(e) => (e.currentTarget.style.display = "none")}
             />
             <span className="fs-3 fw-bold text-white ms-2">
               {weatherData.temp}°C
@@ -384,9 +367,9 @@ export default function CarritoPage() {
                 <img
                   src={item.imageSrc}
                   alt={item.title}
+                  className="cart-img"
                   width={100}
                   height={100}
-                  className="cart-img"
                   style={{ objectFit: "cover" }}
                 />
                 <div className="cart-info">
@@ -436,11 +419,10 @@ export default function CarritoPage() {
           <h3>TOTAL: ${total.toFixed(2)}</h3>
           <Form.Control
             type="text"
-            id="cupon"
             placeholder="Ingrese el cupón de descuento"
+            className="mb-2"
           />
           <Button className="btn-aplicar w-100 mb-2">APLICAR</Button>
-
           <Button
             className="btn-pagar w-100"
             onClick={handleShowCheckout}
@@ -469,7 +451,6 @@ export default function CarritoPage() {
                 Confirmar Compra
               </h4>
 
-              {/* Widget de Clima */}
               <WeatherWidget />
 
               <div className="mb-4 p-3 bg-dark rounded border border-secondary">
@@ -478,7 +459,7 @@ export default function CarritoPage() {
                   <strong>Nombre:</strong>{" "}
                   {renderSafe(
                     currentUser.nombre || currentUser.nombreUsuario,
-                    "Sin Nombre Registrado"
+                    "N/A"
                   )}
                 </p>
                 <p className="mb-1">
@@ -487,6 +468,10 @@ export default function CarritoPage() {
                 <p className="mb-1">
                   <strong>Dirección:</strong>{" "}
                   {renderSafe(currentUser.direccion, "Cargando...")}
+                </p>
+                <p className="mb-1">
+                  <strong>Teléfono:</strong>{" "}
+                  {renderSafe(currentUser.telefono, "No registrado")}
                 </p>
               </div>
 
