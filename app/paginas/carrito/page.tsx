@@ -20,6 +20,13 @@ interface User {
   [key: string]: unknown;
 }
 
+interface WeatherData {
+  temp: number;
+  description: string;
+  icon: string;
+  city: string;
+}
+
 export default function CarritoPage() {
   const [carrito, setCarrito] = useState<CartItem[]>([]);
   const [total, setTotal] = useState(0);
@@ -27,12 +34,19 @@ export default function CarritoPage() {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
 
+  const [weatherData, setWeatherData] = useState<WeatherData | null>(null);
+  const [weatherLoading, setWeatherLoading] = useState(false);
+
   const isLoggedIn = !!currentUser;
 
   // CORRECCIÓN: Evitamos usar process.env directamente ya que puede no estar definido en el navegador
   const baseUrl = "https://ms-products-db-production.up.railway.app";
 
+  //Key de la API
+  const CLIMA_API_KEY =
+    "404fe577ee8921c5b902a764daca8b81eed6e5c30f6bf18eee2585a3d7f112d3";
   // Usamos useCallback para que estas funciones sean estables
+
   const calcularTotal = useCallback((items: CartItem[]) => {
     const nuevoTotal = items.reduce(
       (acc, item) => acc + item.price * item.cantidad,
@@ -64,6 +78,44 @@ export default function CarritoPage() {
     }
   }, [calcularTotal]);
 
+  // --- INTEGRACIÓN API EXTERNA (CLIMA) ---
+  const fetchWeather = useCallback(
+    async (city: string) => {
+      // Si no hay ciudad válida, no llamamos a la API
+      if (!city || city === "N/A" || city === "Cargando...") return;
+
+      setWeatherLoading(true);
+      setWeatherData(null);
+
+      // Limpiamos el nombre (ej: "Santiago, Chile" -> "Santiago")
+      const cleanedCity = city.split(",")[0].trim();
+
+      try {
+        // Llamada a la API Pública
+        const weatherUrl = `https://api.openweathermap.org/data/2.5/weather?q=${cleanedCity},CL&units=metric&lang=es&appid=${CLIMA_API_KEY}`;
+
+        const response = await fetch(weatherUrl);
+        if (response.ok) {
+          const data = await response.json();
+          setWeatherData({
+            temp: Math.round(data.main.temp),
+            description: data.weather[0].description,
+            icon: data.weather[0].icon, // Código de icono (ej: "04d")
+            city: data.name,
+          });
+          console.log("☁️ Clima obtenido para:", cleanedCity);
+        } else {
+          console.warn(`No se pudo cargar el clima para ${cleanedCity}`);
+        }
+      } catch (error) {
+        console.error("❌ Error API Clima:", error);
+      } finally {
+        setWeatherLoading(false);
+      }
+    },
+    [CLIMA_API_KEY]
+  );
+
   const obtenerDatosUsuarioDesdeBackend = useCallback(
     async (correo: string, usuarioLocal: User) => {
       console.log("🔍 Buscando datos frescos en BBDD para:", correo);
@@ -76,14 +128,18 @@ export default function CarritoPage() {
           const datosBackend = await response.json();
           console.log("✅ Datos recibidos del backend:", datosBackend);
 
-          setCurrentUser(
-            (prev) =>
-              ({
-                ...(prev || {}), // Aseguramos que prev no sea null al spreadear
-                ...usuarioLocal,
-                ...datosBackend,
-              } as User)
-          ); // Casting seguro ya que estamos construyendo un User
+          const usuarioCompleto = {
+            ...(usuarioLocal || {}),
+            ...datosBackend,
+          } as User;
+
+          setCurrentUser(usuarioCompleto);
+
+          // ✨ PUNTO DE INTEGRACIÓN:
+          // Una vez tenemos la Comuna desde la BBDD, llamamos a la API de Clima
+          if (usuarioCompleto.comuna) {
+            fetchWeather(usuarioCompleto.comuna);
+          }
         } else {
           console.warn("⚠️ No se encontró información extra en el backend.");
         }
@@ -114,7 +170,13 @@ export default function CarritoPage() {
   }, [cargarCarrito, obtenerDatosUsuarioDesdeBackend]);
 
   const handleCloseCheckout = () => setShowCheckoutModal(false);
-  const handleShowCheckout = () => setShowCheckoutModal(true);
+  const handleShowCheckout = () => {
+    // Intentamos recargar el clima si ya tenemos usuario al abrir el modal
+    setShowCheckoutModal(true);
+    if (currentUser?.comuna) {
+      fetchWeather(currentUser.comuna);
+    }
+  };
 
   const redirectToLogin = () => {
     handleCloseCheckout();
@@ -197,12 +259,48 @@ export default function CarritoPage() {
   };
 
   // Helper para renderizar texto de forma segura (evita error de Objetos como hijos)
-  // CORRECCIÓN: Cambiamos 'any' por 'unknown'
   const renderSafe = (value: unknown, fallback: string) => {
     if (typeof value === "string" || typeof value === "number") {
       return value;
     }
     return fallback;
+  };
+  // --- COMPONENTE VISUAL PARA EL CLIMA ---
+  const WeatherWidget = () => {
+    if (weatherLoading) {
+      return (
+        <div className="text-center text-info mb-3">
+          <Spinner size="sm" animation="border" /> Cargando clima en tu zona...
+        </div>
+      );
+    }
+
+    if (weatherData) {
+      return (
+        <div className="bg-info bg-opacity-25 border border-info rounded p-3 mb-4 d-flex align-items-center justify-content-between">
+          <div>
+            <h6 className="mb-0 text-white">Clima en {weatherData.city}</h6>
+            <small className="text-light text-capitalize">
+              {weatherData.description}
+            </small>
+          </div>
+          <div className="d-flex align-items-center">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={`https://openweathermap.org/img/wn/${weatherData.icon}.png`}
+              alt="Icono clima"
+              width={50}
+              height={50}
+            />
+            <span className="fs-3 fw-bold text-white ms-2">
+              {weatherData.temp}°C
+            </span>
+          </div>
+        </div>
+      );
+    }
+
+    return null; // Si no hay datos, no mostramos nada
   };
 
   return (
@@ -307,7 +405,8 @@ export default function CarritoPage() {
               <h4 className="text-center text-success mb-4">
                 Confirmar Compra
               </h4>
-
+              //visualizar el widget del clima
+              <WeatherWidget />
               <div className="mb-4 p-3 bg-dark rounded border border-secondary">
                 <h5>Datos del Comprador</h5>
                 <p className="mb-1">
@@ -323,9 +422,9 @@ export default function CarritoPage() {
                 <p className="mb-1">
                   <strong>Dirección:</strong>{" "}
                   {renderSafe(currentUser.direccion, "Cargando...")}
+                  {currentUser.comuna ? ` (${currentUser.comuna})` : ""}
                 </p>
               </div>
-
               <div className="mb-4">
                 <h5>Resumen</h5>
                 <div className="d-flex justify-content-between fs-5 fw-bold">
@@ -333,7 +432,6 @@ export default function CarritoPage() {
                   <span>${total.toFixed(2)}</span>
                 </div>
               </div>
-
               <Button
                 variant="success"
                 onClick={handlePurchaseSuccess}
