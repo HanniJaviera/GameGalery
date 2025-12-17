@@ -81,9 +81,7 @@ export default function CarritoPage() {
     async (city: string) => {
       // Validaciones básicas
       if (!city || city === "N/A" || city === "Cargando...") {
-        setWeatherError(
-          "No hay una comuna válida registrada para consultar el clima."
-        );
+        setWeatherError("No hay una ubicación válida para consultar el clima.");
         return;
       }
 
@@ -92,6 +90,7 @@ export default function CarritoPage() {
       setWeatherError(null);
 
       // Limpiamos el nombre de la ciudad
+      // Si 'city' viene de dirección (ej: "Santiago, Chile"), esto tomará "Santiago"
       const cleanedCity = city.split(",")[0].trim();
 
       try {
@@ -155,9 +154,12 @@ export default function CarritoPage() {
 
           setCurrentUser(usuarioCompleto);
 
-          // Si el usuario tiene comuna, cargamos el clima automáticamente
-          if (usuarioCompleto.comuna) {
-            fetchWeather(usuarioCompleto.comuna);
+          // Si el usuario tiene comuna O dirección, intentamos cargar el clima
+          // Priorizamos 'comuna', pero usamos 'direccion' como fallback
+          const ubicacionClima =
+            usuarioCompleto.comuna || usuarioCompleto.direccion;
+          if (ubicacionClima) {
+            fetchWeather(ubicacionClima);
           }
         } else {
           console.warn("⚠️ No se encontró información extra en el backend.");
@@ -194,13 +196,21 @@ export default function CarritoPage() {
 
   const handleShowCheckout = () => {
     setShowCheckoutModal(true);
+
     // Intentamos recargar el clima al abrir el modal si ya tenemos datos
-    if (currentUser?.comuna) {
-      console.log("Intentando cargar clima para comuna:", currentUser.comuna);
-      fetchWeather(currentUser.comuna);
+    // Modificado: Usamos comuna SI existe, si no, usamos dirección.
+    const ubicacionParaClima = currentUser?.comuna || currentUser?.direccion;
+
+    if (ubicacionParaClima) {
+      console.log("Intentando cargar clima para:", ubicacionParaClima);
+      fetchWeather(ubicacionParaClima);
     } else {
-      console.log("No hay comuna registrada en el usuario actual.");
-      setWeatherError("Agrega una comuna a tu perfil para ver el clima.");
+      console.log(
+        "No hay comuna ni dirección registrada en el usuario actual."
+      );
+      setWeatherError(
+        "Agrega una dirección o comuna a tu perfil para ver el clima."
+      );
     }
   };
 
