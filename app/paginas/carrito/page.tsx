@@ -36,16 +36,10 @@ export default function CarritoPage() {
   const [showCheckoutModal, setShowCheckoutModal] = useState(false);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
-
-  // Estados para el Clima
   const [weatherData, setWeatherData] = useState<WeatherData | null>(null);
   const [weatherLoading, setWeatherLoading] = useState(false);
   const [weatherError, setWeatherError] = useState<string | null>(null);
-
   const isLoggedIn = !!currentUser;
-
-  // URL ÚNICA DEL BACKEND
-  // Ahora este backend maneja Usuarios, Ventas y también el Clima (como proxy)
   const baseUrl = "https://ms-products-db-production.up.railway.app";
 
   // --- 1. LÓGICA DEL CARRITO ---
@@ -108,14 +102,12 @@ export default function CarritoPage() {
           const data = await response.json();
           console.log("📦 Respuesta del Backend (Clima):", data);
 
-          // Tu servicio Java devuelve una estructura normalizada:
-          // { name: "...", main: { temp: X }, weather: [{ description: "...", icon: "..." }] }
-          if (data.main) {
+          if (data.temperatura !== undefined) {
             setWeatherData({
-              temp: Math.round(data.main.temp),
-              description: data.weather?.[0]?.description || "Clima actual",
-              icon: data.weather?.[0]?.icon || "01d",
-              city: data.name || cleanedCity,
+              temp: Math.round(data.temperatura),
+              description: "Clima actual",
+              icon: "01d",
+              city: data.ciudad || cleanedCity,
             });
           } else {
             setWeatherError(
@@ -224,7 +216,7 @@ export default function CarritoPage() {
     const ubicacionParaClima = currentUser?.comuna || currentUser?.direccion;
 
     if (ubicacionParaClima) {
-      // Solo pedimos si no tenemos datos ya (para no spamear al backend)
+      // Solo pedimos si no tenemos datos ya
       if (!weatherData) fetchWeather(ubicacionParaClima);
     } else {
       setWeatherError("Agrega una dirección a tu perfil para ver el clima.");
